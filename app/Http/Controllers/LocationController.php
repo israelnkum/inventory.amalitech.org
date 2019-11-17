@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Location;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
-class CollectedItemController extends Controller
+class LocationController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -13,7 +16,8 @@ class CollectedItemController extends Controller
      */
     public function index()
     {
-        //
+        $locations = Location::all();
+        return view('pages.config.locations.index',compact('locations'));
     }
 
     /**
@@ -34,7 +38,30 @@ class CollectedItemController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $check = Location::where('country',$request->country)
+            ->where('city_town',$request->city_town)->first();
+        if (!empty($check)){
+            return back()->with('error','Location Already Exist');
+        }
+
+        DB::beginTransaction();
+        try{
+            $location = new Location();
+            $location->country = $request->country;
+            $location->country_prefix = strtoupper($request->country_prefix);
+            $location->city_town = strtoupper($request->city_town);
+            $location->city_town_prefix = strtoupper($request->city_town_prefix);
+            $location->user_id = Auth::user()->id;
+
+            if ($location->save()){
+                DB::commit();
+                return back()->with('success','New Location Created');
+            }
+        }catch (\Exception $exception){
+            DB::rollBack();
+            return back()->with('warning','Something went wrong, Try Again');
+        }
+
     }
 
     /**

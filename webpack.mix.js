@@ -13,6 +13,9 @@ const mix = require('laravel-mix');
 
 mix.js([
     'resources/js/app.js',
+    'resources/js/select2.min.js',
+    'resources/js/dataTables.select.min.js',
+    'resources/js/jquery.input-mask.js',
     'resources/js/custom.js',
 ], 'public/js/app.js').version()
    .sass('resources/sass/app.scss', 'public/css');

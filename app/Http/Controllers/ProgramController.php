@@ -2,7 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Area;
+use App\Brand;
+use App\Category;
+use App\ItemType;
+use App\Location;
+use App\Ownership;
 use App\Program;
+use App\Status;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -10,6 +17,11 @@ use Illuminate\Support\Facades\DB;
 
 class ProgramController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -34,7 +46,16 @@ class ProgramController extends Controller
     public function config(){
         $users = User::all()->count();
         $programs = Program::all()->count();
-        return view('pages.config.index',compact('users','programs'));
+        $locations = Location::all()->count();
+        $categories = Category::all()->count();
+        $areas = Area::all()->count();
+        $itemType = ItemType::all()->count();
+        $brand = Brand::all()->count();
+        $ownership = Ownership::all()->count();
+        $status = Status::all()->count();
+        return view('pages.config.index',
+            compact('users','programs','locations','categories','areas','itemType',
+            'brand','ownership','status'));
     }
     /**
      * Store a newly created resource in storage.

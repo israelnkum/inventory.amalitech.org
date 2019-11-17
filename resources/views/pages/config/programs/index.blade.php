@@ -10,18 +10,17 @@
                     <a href="{{route('programs.index')}}">Programs</a>
                 </li>
             @endcomponent
-            <div class="col-md-12 text-right">
-                <button class="btn btn-primary" data-toggle="modal" data-target="#addStudent">New Program</button>
-            </div>
             <div class="col-md-10">
                 <div class="card border-0 shadow-sm bg-transparent">
-                    <div class="card-header text-danger">
-                        All Programs
+                    <div class="card-header text-danger p-2">
+                        All Users
+                        <button class="btn btn-sm btn-primary float-right" data-toggle="modal" data-target="#addStudent">New Program</button>
                     </div>
                     <div class="card-body">
                         <table id="programs" class="table-borderless table-striped table">
                             <thead>
                             <tr>
+                                <td></td>
                                 <th>#</th>
                                 <th>Program Name</th>
                                 <th>Prefix</th>
@@ -32,6 +31,7 @@
                             @php($i=1)
                             @foreach($allPrograms as $programs)
                                 <tr>
+                                    <td></td>
                                     <td>{{$i}}</td>
                                     <td>{{$programs->name}}</td>
                                     <td>{{$programs->prefix}}</td>

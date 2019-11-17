@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCollectedItemsTable extends Migration
+class CreateBrandsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,9 @@ class CreateCollectedItemsTable extends Migration
      */
     public function up()
     {
-        Schema::create('collected_items', function (Blueprint $table) {
+        Schema::create('brands', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->integer('student_id');
-            $table->integer('item_id');
-            $table->longText('collection_comment');
-            $table->string('date_collected');
-            $table->string('dated_returned');
-            $table->longText('return_comment');
+            $table->string('name');
             $table->integer('user_id');
             $table->timestamps();
         });
@@ -33,6 +28,6 @@ class CreateCollectedItemsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('collected_items');
+        Schema::dropIfExists('brands');
     }
 }

@@ -38,21 +38,6 @@
                 </div>
             </div>
         </div>
-
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cupiditate fuga ipsa modi obcaecati perferendis placeat quaerat suscipit tempore voluptate! Aliquam architecto debitis in iusto quaerat repudiandae rerum sit suscipit vel.
-
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cupiditate fuga ipsa modi obcaecati perferendis placeat quaerat suscipit tempore voluptate! Aliquam architecto debitis in iusto quaerat repudiandae rerum sit suscipit vel.
-
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cupiditate fuga ipsa modi obcaecati perferendis placeat quaerat suscipit tempore voluptate! Aliquam architecto debitis in iusto quaerat repudiandae rerum sit suscipit vel.
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cupiditate fuga ipsa modi obcaecati perferendis placeat quaerat suscipit tempore voluptate! Aliquam architecto debitis in iusto quaerat repudiandae rerum sit suscipit vel.
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cupiditate fuga ipsa modi obcaecati perferendis placeat quaerat suscipit tempore voluptate! Aliquam architecto debitis in iusto quaerat repudiandae rerum sit suscipit vel.
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cupiditate fuga ipsa modi obcaecati perferendis placeat quaerat suscipit tempore voluptate! Aliquam architecto debitis in iusto quaerat repudiandae rerum sit suscipit vel.
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cupiditate fuga ipsa modi obcaecati perferendis placeat quaerat suscipit tempore voluptate! Aliquam architecto debitis in iusto quaerat repudiandae rerum sit suscipit vel.
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cupiditate fuga ipsa modi obcaecati perferendis placeat quaerat suscipit tempore voluptate! Aliquam architecto debitis in iusto quaerat repudiandae rerum sit suscipit vel.
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cupiditate fuga ipsa modi obcaecati perferendis placeat quaerat suscipit tempore voluptate! Aliquam architecto debitis in iusto quaerat repudiandae rerum sit suscipit vel.
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cupiditate fuga ipsa modi obcaecati perferendis placeat quaerat suscipit tempore voluptate! Aliquam architecto debitis in iusto quaerat repudiandae rerum sit suscipit vel.
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cupiditate fuga ipsa modi obcaecati perferendis placeat quaerat suscipit tempore voluptate! Aliquam architecto debitis in iusto quaerat repudiandae rerum sit suscipit vel.
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cupiditate fuga ipsa modi obcaecati perferendis placeat quaerat suscipit tempore voluptate! Aliquam architecto debitis in iusto quaerat repudiandae rerum sit suscipit vel.
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cupiditate fuga ipsa modi obcaecati perferendis placeat quaerat suscipit tempore voluptate! Aliquam architecto debitis in iusto quaerat repudiandae rerum sit suscipit vel.
+    </div>
     </div>
 @endsection

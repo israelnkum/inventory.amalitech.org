@@ -12,58 +12,55 @@
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
     <!-- Styles -->
     <link href="{{ mix('css/app.css') }}" rel="stylesheet">
- </head>
-<body>
-<div id="app">
-    <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm sticky-top">
-        <div class="container">
-            <a class="navbar-brand" href="{{ route('home') }}">
-                {{ config('app.name', 'Home') }}
-            </a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
-                <span class="navbar-toggler-icon"></span>
-            </button>
 
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <!-- Left Side Of Navbar -->
-                <ul class="navbar-nav ml-auto">
-                    @guest
-                    @else
+</head>
+<body style="background: #e9ecef @if(\Request::is('/')) url('{{asset('inventory.jpg')}}') center center no-repeat; background-size: cover; @endif">
+<div id="app">
+    @guest
+
+    @else
+        <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm sticky-top">
+            <div class="container">
+                <a class="navbar-brand" href="{{ route('home') }}">
+                    <img height="auto" width="200" src="{{asset('logo.png')}}" alt="Amalitech-Inventory" class="img-fluid">
+                </a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <!-- Left Side Of Navbar -->
+                    <ul class="navbar-nav ml-auto">
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('students.index') }}">{{ __('Students') }}</a>
+                            <a class="nav-link" href="{{ route('students.index') }}">{{ __('Trainee') }}</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('students.index') }}">{{ __('Items') }}</a>
+                            <a class="nav-link" href="{{ route('staff.index') }}">{{ __('Staff') }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('items.index') }}">{{ __('Items') }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('items.index') }}">{{ __('Store') }}</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('config') }}">{{ __('Config') }}</a>
                         </li>
-                    @endguest
-                </ul>
-
-                <!-- Right Side Of Navbar -->
-                <ul class="navbar-nav ml-auto">
-                    <!-- Authentication Links -->
-                    @guest
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
-                        </li>
-                        @if (Route::has('register'))
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
-                            </li>
-                        @endif
-                    @else
+                    </ul>
+                    <ul class="navbar-nav ml-auto">
                         <li class="nav-item dropdown">
                             <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                {{ Auth::user()->name }} <span class="caret"></span>
+                                <img class="img-fluid rounded-circle" height="auto" width="30" src="{{asset('avata.png')}}" alt="">
                             </a>
 
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" href="{{ route('logout') }}">
+                                    <i class="fa fa-cog"></i> Settings
+                                </a>
                                 <a class="dropdown-item" href="{{ route('logout') }}"
                                    onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">
-                                    {{ __('Logout') }}
+                                    <i class="fa fa-sign-in-alt"></i>  {{ __('Logout') }}
                                 </a>
 
                                 <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
@@ -71,11 +68,12 @@
                                 </form>
                             </div>
                         </li>
-                    @endguest
-                </ul>
+                    </ul>
+                </div>
             </div>
-        </div>
-    </nav>
+        </nav>
+    @endguest
+
     <main class="py-4">
         @yield('content')
     </main>
