@@ -9,12 +9,13 @@
     <title>{{ config('app.name', 'AMALITECH - INVENTORY') }}</title>
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
+    <link rel="shortcut icon" href="{{asset('favicon.ico')}}">
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
     <!-- Styles -->
     <link href="{{ mix('css/app.css') }}" rel="stylesheet">
 
 </head>
-<body style="background: #e9ecef @if(\Request::is('/')) url('{{asset('inventory.jpg')}}') center center no-repeat; background-size: cover; @endif">
+<body style="background: #e9ecef @if(\Request::is('/') || \Request::is('login')) url('{{asset('inventory.jpg')}}') center center no-repeat; background-size: cover; @endif">
 <div id="app">
     @guest
 
@@ -38,10 +39,10 @@
                             <a class="nav-link" href="{{ route('staff.index') }}">{{ __('Staff') }}</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('items.index') }}">{{ __('Items') }}</a>
+                            <a class="nav-link" href="{{ route('items.index') }}">{{ __('Inventory') }}</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('items.index') }}">{{ __('Store') }}</a>
+                            <a class="nav-link" href="{{ route('stores.index') }}">{{ __('Store') }}</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('config') }}">{{ __('Config') }}</a>
@@ -85,6 +86,8 @@
         </div>
     </div>
 </div>
+
 <script src="{{ mix('js/app.js') }}" defer></script>
+
 </body>
 </html>

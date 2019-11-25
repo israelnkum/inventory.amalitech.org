@@ -13,4 +13,8 @@ class Staff extends Model
     public function program_teaching(){
         return $this->hasMany('App\ProgramTeaching');
     }
+
+    public function designation(){
+        return $this->belongsTo('App\Designation');
+    }
 }

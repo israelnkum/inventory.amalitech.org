@@ -16,12 +16,13 @@ class CreateStaffIssueItemsTable extends Migration
         Schema::create('staff_issue_items', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->integer('staff_id');
-            $table->integer('inventory_id');
+            $table->integer('item_id');
             $table->longText('issue_remarks');
             $table->string('date_collected');
-            $table->string('dated_returned');
+            $table->string('issued_by');
             $table->longText('return_remarks');
-            $table->integer('user_id');
+            $table->string('dated_returned');
+            $table->string('received_by');
             $table->timestamps();
         });
     }

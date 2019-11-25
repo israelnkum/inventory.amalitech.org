@@ -27,7 +27,7 @@ class CreateStudentsTable extends Migration
             $table->string('registration_number');
             $table->string('student_number');
             $table->string('phone_number',25);
-            $table->string('profile')->default('avata.png');
+            $table->string('staff')->default('avata.png');
             $table->string('qr_code');
             $table->timestamps();
         });

@@ -29,15 +29,66 @@
 
     <div class="container">
         <div class="row">
-            @if(count($staff) == 0)
-                <div class="text-center mt-5 col-md-12">
-                    <h4 class="display font-weight-lighter text-danger">Oops! No Trainee added yet</h4>
+            <div class="col-md-3">
+                <div class="card bg-transparent border-0 shadow-sm">
+                    <div class="card-header">
+                        Quick Filter
+                    </div>
+                    <div class="card-body bg-transparent ">
+                        <form action="{{route('filter-staff')}}" method="get" id="filter-trainers-form">
+                            @csrf
+                            <div class="form-group row">
+                                <div class="form-group row">
+                                    <div class="col-md-12">
+                                        <label for="filter-trainer-locations" class="mb-0">Location</label>
+                                        <select  required id="filter-trainer-locations" style="width: 100%" name="location_id" class="form-control form-control-lg select2">
+                                            <option value=""></option>
+                                            @foreach($locations as $types)
+                                                <option {{ old('location_id') == $types->id ? 'selected' : '' }}  value="{{$types->id}}">{{$types->country.", ".$types->city_town}}</option>
+                                            @endforeach
+                                        </select>
+                                        <div class="invalid-feedback">
+                                            Items Type required
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 mb-2">
+                                        <label for="filter-trainer-gender" class="mb-0">Gender</label>
+                                        <select  required id="filter-trainer-gender" style="width: 100%" name="gender" class="form-control form-control-lg select2">
+                                            <option value=""></option>
+                                            <option {{ old('gender') == 'Male' ? 'selected' : '' }}  value="Male">Male</option>
+                                            <option {{ old('gender') == 'Female' ? 'selected' : '' }}  value="Female">Female</option>
+                                        </select>
+                                    </div>
+                                    {{--<div class="col-md-12 mb-2">
+                                        <label for="filter-trainer-programs" class="mb-0">Specialization</label>
+                                        <select required id="filter-trainer-programs" style="width: 100%" name="programs" class="form-control form-control-lg select2">
+                                            <option value=""></option>
+                                            @foreach($programs as $types)
+                                                <option {{ old('programs') == $types->id ? 'selected' : '' }} value="{{$types->id}}">{{$types->name}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>--}}
+                                    <div class="col-md-12">
+                                        <label for="filter-trainer-designation" class="mb-0">Designation</label>
+                                        <select  id="filter-trainer-designation" style="width: 100%" name="designation_id" class="form-control form-control-lg select2">
+                                            <option value=""></option>
+                                            @foreach($designations as $types)
+                                                <option {{ old('designation_id') == $types->id ? 'selected' : '' }} value="{{$types->id}}">{{$types->designation}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-            @else
-                <div class="col-md-4">
-
-                </div>
-                <div class="col-md-8">
+            </div>
+            <div class="col-md-9">
+                @if(count($staff) == 0)
+                    <div class="text-center mt-5 col-md-12">
+                        <h4 class="display font-weight-lighter text-danger">Oops! No Data Found</h4>
+                    </div>
+                @else
                     <div class="card bg-transparent border-0 shadow-sm">
                         <div class="card-header bg-transparent border-0 pb-0">
                             <span class="float-right">{!! $staff->fragment(Hash::make(time()))->render() !!}</span>
@@ -46,15 +97,16 @@
                             <table class="table  table-hover">
                                 <tbody>
                                 @foreach ($staff as $trainer)
-                                    <tr>
-                                        <td>
-                                            <img height="50" width="50" src="{{asset('assets/img/profile/staff/'.$trainer->profile)}}" alt="" class="img-fluid">
+                                    <tr >
+                                        <td class="text-center">
+                                            <img height="auto" width="90"  src="{{asset('assets/img/profile/staff/'.$trainer->profile)}}" alt="" class="img-fluid">
                                         </td>
-                                        <td class="text-uppercase">
+                                        <td class="text-uppercase text-left">
                                             <a class="text-decoration-none text-dark" href="{{route('staff.edit',$trainer->id)."?".Hash::make(time())}}">
-
-                                                {{$trainer->first_name." ".$trainer->other_name."".$trainer->last_name}}<br>
-                                                {{--                                                {{$student->registration_number}}--}}
+                                                <b>{{$trainer->first_name." ".$trainer->other_name." ".$trainer->last_name}}</b><br>
+                                                {{$trainer->registration_number}}<br>
+                                                {{$trainer->phone_number}}<br>
+                                                <span class="text-lowercase">{{$trainer->email}}</span>
                                             </a>
                                         </td>
                                         <td>
@@ -70,8 +122,9 @@
                             <span class="float-right">{!! $staff->fragment(Hash::make(time()))->render() !!}</span>
                         </div>
                     </div>
-                </div>
-            @endif
+                @endif
+            </div>
+
         </div>
     </div>
 
@@ -143,7 +196,12 @@
                                     </div>
                                     <div class="col-md-4">
                                         <label for="designation" class="mb-0">Designation</label>
-                                        <input type="text" required class="form-control form-control-sm" name="designation" id="designation" placeholder="Designation">
+                                        <select required id="designation" style="width: 100%" name="designation" class="form-control form-control-lg select2">
+                                            <option value=""></option>
+                                            @foreach($designations as $types)
+                                                <option {{ old('designation_id') == $types->id ? 'selected' : '' }} value="{{$types->id}}">{{$types->designation}}</option>
+                                            @endforeach
+                                        </select>
                                         <div class="invalid-feedback">
                                             Designation required
                                         </div>

@@ -22,7 +22,7 @@
                             <div class="col-md-8">
                                 <div class="row">
                                     <div class="col-md-4">
-                                        <img height="auto" width="85" src="{{asset('assets/img/items/'.$item->picture)}}" alt="" class="img-fluid">
+                                        <img src="{{asset('assets/img/items/'.$item->picture)}}" alt="" class="img-fluid">
                                     </div>
                                     <div class="col-md-7">
                                         <p>
@@ -34,8 +34,6 @@
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <img height="70" width="70" src="{{asset('assets/qr_codes/items/'.$item->qr_code)}}" alt="" class="img-fluid">
-                                {{--                                <p>{{$items->program->name}}</p>--}}
                                 <form onsubmit="return confirm('Do you really want to delete?')" action="{{route('items.destroy',$item->id)}}" method="post">
                                     @csrf
                                     {!! @method_field('delete') !!}
@@ -43,6 +41,7 @@
                                 </form>
                             </div>
                         </div>
+                        <hr>
                         <div class="">
                             <div class="mt-5">
                                 <p class="mb-0 font-weight-bold">Description</p>
@@ -86,17 +85,7 @@
                         Activity
                     </div>
                     <div class="card-body">
-                        <div class="d-flex  align-items-center">
-                            {{-- <div class="ml-3">
-                                 <p>
-                                     {{$items->first_name." ".$items->other_name."".$items->last_name}}<br>
-                                     {{$items->registration_number}}<br>
-                                 </p>
-                                 <small>{{$items->location->country.", ".$items->location->city_town}}<br></small>
-                                 <small class="mb-0">{{$items->phone_number}}</small><br>
-                                 <small class="mt-0">{{$items->email}}</small>
-                             </div>--}}
-                        </div>
+                        <img  src="{{asset('assets/qr_codes/items/'.$item->qr_code)}}" alt="">
                     </div>
                 </div>
             </div>

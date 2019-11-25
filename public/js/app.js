@@ -65221,6 +65221,66 @@ $(document).ready(function () {
   }); //End brand Table
 
   /*
+  designations Table
+  */
+
+  var designation_table = $("#designation_table").DataTable({
+    columnDefs: [{
+      orderable: false,
+      className: 'select-checkbox',
+      targets: 0
+    }],
+    select: {
+      style: 'multi',
+      selector: 'td:first-child'
+    },
+    order: [[1, 'asc']]
+  });
+  designation_table.column(2).visible(false);
+  designation_table.on('click', '.edit', function () {
+    var $tr = $(this).closest('tr');
+
+    if ($($tr).hasClass('child')) {
+      $tr = $tr.prev('.parent');
+    }
+
+    var data = designation_table.row($tr).data();
+    $('#edit-designation_name').val(data[3]);
+    $('#edit-designation-form').attr('action', 'designations/' + data[2]);
+    $('#edit-designation-modal').modal('show');
+    $('#designation-title').text(data[3]);
+  }); //delete area
+
+  var designation_ids = [];
+  $('#designation_table tbody').on('click', 'td:first-child', function () {
+    var $tr = $(this).closest('tr');
+
+    if ($($tr).hasClass('child')) {
+      $tr = $tr.prev('.parent');
+    }
+
+    var data = designation_table.row($tr).data();
+
+    if (!designation_ids.includes(data[2])) {
+      designation_ids.push(data[2]);
+    } else {
+      for (var i = 0; i < designation_ids.length; i++) {
+        if (designation_ids[i] === data[2]) {
+          designation_ids.splice(i, 1);
+        }
+      }
+    }
+
+    if (designation_ids.length > 0) {
+      $('#btn-delete-designation').removeAttr('disabled');
+    } else {
+      $('#btn-delete-designation').attr('disabled', 'disabled');
+    }
+
+    $("#designation_ids").val(designation_ids);
+  }); //End designations Table
+
+  /*
   Ownership Table
   */
 
@@ -65557,7 +65617,50 @@ $(document).ready(function () {
 
       reader.readAsDataURL(input.files[0]);
     }
-  }
+  } //filter Students
+
+
+  $('#filter-students-locations').change(function () {
+    $('#filter-students-form').submit();
+  });
+  $('#filter-students-gender').change(function () {
+    $('#filter-students-form').submit();
+  });
+  $('#filter-students-programs').change(function () {
+    $('#filter-students-form').submit();
+  });
+  $('#filter-students-sessions').change(function () {
+    $('#filter-students-form').submit();
+  }); //filter items
+
+  $('#filter-items-category').change(function () {
+    $('#filter-items-form').submit();
+  });
+  $('#filter-items-type').change(function () {
+    $('#filter-items-form').submit();
+  });
+  $('#filter-items-brand').change(function () {
+    $('#filter-items-form').submit();
+  });
+  $('#filter-items-area').change(function () {
+    $('#filter-items-form').submit();
+  });
+  $('#filter-items-ownership').change(function () {
+    $('#filter-items-form').submit();
+  });
+  $('#filter-items-status').change(function () {
+    $('#filter-items-form').submit();
+  }); //filter staff
+
+  $('#filter-trainer-locations').change(function () {
+    $('#filter-trainers-form').submit();
+  });
+  $('#filter-trainer-gender').change(function () {
+    $('#filter-trainers-form').submit();
+  });
+  $('#filter-trainer-designation').change(function () {
+    $('#filter-trainers-form').submit();
+  });
 });
 
 /***/ }),

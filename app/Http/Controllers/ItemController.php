@@ -28,7 +28,7 @@ class ItemController extends Controller
      */
     public function index()
     {
-        $allItems = Item::simplePaginate(2);
+        $allItems = Item::simplePaginate(50);
         $item_types = ItemType::all();
         $categories = Category::all();
         $brands = Brand::all();
@@ -39,11 +39,48 @@ class ItemController extends Controller
             compact('allItems','item_types','categories','brands','areas','ownership','status'));
     }
 
-    public function filterItems(Request $request){
-        $items = Item::query();
-        if ($request->has('type') && $request->input('type') != ""){
-            $reports = Patient::all();
+    public function filterItems(Request $request, Item $itemQuery){
+
+        $itemQuery = $itemQuery::query();
+
+        if($request->has('category')&& $request->input('category') != '' )
+        {
+            $itemQuery->where('category_id', $request->input('category'));
         }
+        if($request->has('type')&& $request->input('type') != '' )
+        {
+            $itemQuery->where('item_type_id', $request->input('type'));
+        }
+
+        if($request->has('brand')&& $request->input('brand') != '' )
+        {
+            $itemQuery->where('brand_id', $request->input('brand'));
+        }
+
+        if($request->has('area')&& $request->input('area') != '' )
+        {
+            $itemQuery->where('area_id', $request->input('area'));
+        }
+        if($request->has('ownership')&& $request->input('ownership') != '' )
+        {
+            $itemQuery->where('ownership_id', $request->input('ownership'));
+        }
+        if($request->has('status')&& $request->input('status') != '' )
+        {
+            $itemQuery->where('status_id', $request->input('status'));
+        }
+
+        $allItems = $itemQuery->simplePaginate(50);
+        $item_types = ItemType::all();
+        $categories = Category::all();
+        $brands = Brand::all();
+        $areas = Area::all();
+        $ownership = Ownership::all();
+        $status = Status::all();
+        session()->flashInput($request->input());
+        return view('pages.items.index',
+            compact('allItems','item_types','categories','brands','areas','ownership','status'))
+            ->withInput($request->all);
     }
 
     /**
@@ -82,7 +119,7 @@ class ItemController extends Controller
         /*
          * Generate QR Code
          */
-        QrCode::format('png')->size(100)->generate($request->asset_tag_number,
+        QrCode::format('png')->generate($request->asset_tag_number,
             public_path('assets/qr_codes/items/'.$request->asset_tag_number.'.png'));
         DB::beginTransaction();
         try{
@@ -161,7 +198,7 @@ class ItemController extends Controller
         /*
          * Generate QR Code
          */
-        QrCode::format('png')->size(100)->generate($request->asset_tag_number,
+        QrCode::format('png')->generate($request->asset_tag_number,
             public_path('assets/qr_codes/items/'.$request->asset_tag_number.'.png'));
         DB::beginTransaction();
         try{
@@ -181,12 +218,10 @@ class ItemController extends Controller
             $item->user_id = Auth::user()->id;
             if ($item->save()){
                 DB::commit();
-                return back()->with('success','items Updated');
+                return back()->with('success','Item Updated');
             }
         }catch (\Exception $exception){
             DB::rollBack();
-
-            return $exception;
             return back()->with('warning','Something went wrong, Try Again!');
         }
     }

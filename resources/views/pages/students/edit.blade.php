@@ -4,7 +4,7 @@
         <div class="row ">
             @component('partials.breadcrumb')
                 <li class="breadcrumb-item" aria-current="page">
-                    <a href="{{route('students.index')}}">Student</a>
+                    <a href="{{route('students.index')}}">Trainee</a>
                 </li>
                 <li class="breadcrumb-item active" aria-current="page">
                     <a href="{{route('students.edit',$trainee->id)."?".Hash::make(time())}}">{{$trainee->registration_number}}</a>
@@ -22,11 +22,11 @@
                             <div>
                                 <div class="row">
                                     <div class="col-md-4">
-                                        <img height="70" width="70" src="{{asset('assets/img/profile/'.$trainee->profile)}}" alt="" class="img-fluid">
+                                        <img height="70" width="70" src="{{asset('assets/img/profile/trainees/'.$trainee->profile)}}" alt="" class="img-fluid">
                                     </div>
                                     <div class="col-md-8">
                                         <p>
-                                            {{$trainee->first_name." ".$trainee->other_name."".$trainee->last_name}}<br>
+                                            {{$trainee->first_name." ".$trainee->other_name." ".$trainee->last_name}}<br>
                                             {{$trainee->registration_number}}<br>
                                         </p>
                                         <small><i class="fa fa-map-marker-alt"></i> {{$trainee->location->country.", ".$trainee->location->city_town}}<br></small>
@@ -38,7 +38,7 @@
                                 </div>
                             </div>
                             <div class="">
-                                <img height="70" width="70" src="{{asset('assets/qr_codes/'.$trainee->qr_code)}}" alt="" class="img-fluid">
+                                <img height="70" width="70" src="{{asset('assets/qr_codes/trainees/'.$trainee->qr_code)}}" alt="" class="img-fluid">
                                 <p>{{$trainee->program->name}}</p>
                                 <p><span class="font-weight-bold">Session: </span>{{$trainee->session->name}}</p>
                                 <form onsubmit="return confirm('Do you really want to delete?')" action="{{route('students.destroy',$trainee->id)}}" method="post">
@@ -60,7 +60,7 @@
                         <div class="d-flex  align-items-center">
                             <div class="ml-3">
                                 <p>
-                                    {{$trainee->first_name." ".$trainee->other_name."".$trainee->last_name}}<br>
+                                    {{$trainee->first_name." ".$trainee->other_name." ".$trainee->last_name}}<br>
                                     {{$trainee->registration_number}}<br>
                                 </p>
                                 <small>{{$trainee->location->country.", ".$trainee->location->city_town}}<br></small>
@@ -92,7 +92,7 @@
                                 <p class="text-danger text-center" id="displayError"> <b><span id="boldertext"></span></b></p>
                                 <div class="picture-container">
                                     <div class="picture">
-                                        <img src="{{asset('assets/img/profile/'.$trainee->profile)}}" class="picture-src img-fluid" id="wizardPicturePreview" title="Click to select picture" />
+                                        <img src="{{asset('assets/img/profile/trainees/'.$trainee->profile)}}" class="picture-src img-fluid" id="wizardPicturePreview" title="Click to select picture" />
                                         <input  type="file" class="form-control" name="image_file"   id="wizard-picture">
                                     </div>
                                     <h6>Choose Picture</h6>

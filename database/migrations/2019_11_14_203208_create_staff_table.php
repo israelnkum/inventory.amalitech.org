@@ -15,8 +15,10 @@ class CreateStaffTable extends Migration
     {
         Schema::create('staff', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('staff_id_number');
             $table->integer('location_id');
+            $table->string('designation_id');
+            $table->string('registration_number');
+            $table->string('staff_number');
             $table->string('first_name');
             $table->string('last_name');
             $table->string('other_name')->nullable();
@@ -24,11 +26,11 @@ class CreateStaffTable extends Migration
             $table->string('gender',15);
             $table->string('phone_number',20);
             $table->string('email');
-            $table->string('designation');
             $table->string('joining_date',20);
             $table->string('contract_valid_till',20);
             $table->string('profile',25);
-            $table->string('remarks',500);
+            $table->string('qr_code',25);
+            $table->string('remarks',500)->default('No remarks');
             $table->timestamps();
         });
     }

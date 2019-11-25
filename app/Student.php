@@ -16,4 +16,9 @@ class Student extends Model
     public function session(){
         return $this->belongsTo('App\Session');
     }
+    protected $fillable =
+        ['location_id','program_id','session_id','first_name','last_name',
+            'other_name','dob','gender','email','registration_number',
+            'student_number', 'phone_number', 'staff', 'qr_code'
+    ];
 }

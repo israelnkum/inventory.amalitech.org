@@ -27,8 +27,30 @@
                                     </div>
                                 </div>
                             </div>
-                            <button type="submit" class="btn btn-primary">Add Status</button>
+                            <button type="submit" class="btn btn-primary float-right btn-sm"><i class="fa fa-save"></i> Add Status</button>
                         </form>
+                    </div>
+                </div>
+
+                <div class="card mt-5 border-0 shadow-sm bg-transparent">
+                    <div class="card-header p-2">
+                        Default status
+                    </div>
+                    <div class="card-body">
+                        <table class="table-borderless table-striped table">
+                            <tbody>
+                            @php($i=1)
+                            @foreach($statuses as $status)
+                                @if($status->name == "In-Service" || $status->name == "In-Store")
+                                    <tr>
+                                        <td>{{$i}}</td>
+                                        <td>{{$status->name}}</td>
+                                    </tr>
+                                @endif
+                                @php($i++)
+                            @endforeach
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -38,7 +60,7 @@
                         @csrf
                         <input type="hidden" id="status_ids" class="form-control-sm" name="selected_ids">
                         <div class="card-header text-danger p-2">
-                            All status
+                            All Statuses
                             <div class="dropleft float-right">
                                 <button disabled id="btn-delete-status" class="btn btn-link text-danger text-decoration-none text-right" type="submit">Delete</button>
 
@@ -62,23 +84,26 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                @php($i=1)
+                                @php($i= -1)
                                 @foreach($statuses as $status)
-                                    <tr>
-                                        <td></td>
-                                        <td>{{$i}}</td>
-                                        <td>{{$status->id}}</td>
-                                        <td>{{$status->name}}</td>
-                                        <td>
-                                            <a title="Edit {{$status->name}}" href="javascript:void(0)" class="edit text-decoration-none">
-                                                Edit <i class="fa fa-pen"></i>
-                                            </a>
-                                        </td>
-                                    </tr>
+                                    @if($status->name != "In-Service" && $status->name != "In-Store")
+                                        <tr>
+                                            <td></td>
+                                            <td>{{$i}}</td>
+                                            <td>{{$status->id}}</td>
+                                            <td>{{$status->name}}</td>
+                                            <td>
+                                                <a  title="Edit {{$status->name}}" href="javascript:void(0)" class="edit btn btn-secondary btn-sm text-decoration-none">
+                                                    Edit
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    @endif
                                     @php($i++)
                                 @endforeach
                                 </tbody>
                             </table>
+
                         </div>
                     </form>
                 </div>

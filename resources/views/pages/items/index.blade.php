@@ -25,89 +25,105 @@
                     </div>
                 </form>
             </div>
-            <div class="col-md-2">
-                <button class="btn btn-primary" data-toggle="modal" data-target="#addStudent">Add Item</button>
+            <div class="col-md-3">
+                <div class="btn-group" role="group" aria-label="Basic example">
+                    <button type="button" class="btn btn-sm btn-secondary" data-toggle="modal" data-target="#addStudent">Add Item</button>
+                    <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#uploadTrainee">Upload Item(s)</button>
+                </div>
             </div>
         </div>
     </div>
     <div class="container">
         <div class="row">
-            @if(count($allItems) == 0)
-                <div class="text-center mt-5 col-md-12">
-                    <h4 class="display font-weight-lighter text-danger">Oops! No item added yet</h4>
-                </div>
-            @else
-                <div class="col-md-3">
-                    <div class="card bg-transparent border-0 shadow-sm">
-                        <div class="card-body bg-transparent ">
-                            <form action="">
-                                <div class="form-group row">
-                                    <div class="col-md-12">
-                                        <label for="filter-type" class="mb-0">Item Type</label>
-                                        <select required id="filter-type" style="width: 100%" name="type" class="form-control form-control-lg select2">
-                                            <option value=""></option>
-                                            @foreach($item_types as $types)
-                                                <option value="{{$types->id}}">{{$types->name}}</option>
-                                            @endforeach
-                                        </select>
-                                        <div class="invalid-feedback">
-                                            Items Type required
-                                        </div>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <label for="filter-brand" class="mb-0">Brand</label>
-                                        <select required id="filter-brand" style="width: 100%" name="brand" class="form-control form-control-lg select2">
-                                            <option value=""></option>
-                                            @foreach($brands as $types)
-                                                <option value="{{$types->id}}">{{$types->name}}</option>
-                                            @endforeach
-                                        </select>
-                                        <div class="invalid-feedback">
-                                            Brand required
-                                        </div>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <label for="filter-area" class="mb-0">Area</label>
-                                        <select required id="filter-area" style="width: 100%" name="area" class="form-control form-control-lg select2">
-                                            <option value=""></option>
-                                            @foreach($areas as $types)
-                                                <option value="{{$types->id}}">{{$types->name}}</option>
-                                            @endforeach
-                                        </select>
-                                        <div class="invalid-feedback">
-                                            Area required
-                                        </div>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <label for="filter-ownership" class="mb-0">Ownership</label>
-                                        <select required id="filter-ownership" style="width: 100%" name="ownership" class="form-control form-control-lg select2">
-                                            <option value=""></option>
-                                            @foreach($ownership as $types)
-                                                <option value="{{$types->id}}">{{$types->description}}</option>
-                                            @endforeach
-                                        </select>
-                                        <div class="invalid-feedback">
-                                            Ownership required
-                                        </div>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <label for="filter-status" class="mb-0">Status</label>
-                                        <select required id="filter-status" style="width: 100%" name="status" class="form-control form-control-lg select2">
-                                            <option value=""></option>
-                                            @foreach($status as $types)
-                                                <option value="{{$types->id}}">{{$types->name}}</option>
-                                            @endforeach
-                                        </select>
-                                        <div class="invalid-feedback">
-                                            Status required
-                                        </div>
+            <div class="col-md-3">
+                <div class="card bg-transparent border-0 shadow-sm">
+                    <div class="card-body bg-transparent ">
+                        <form action="{{route('filter-items')}}" method="post" id="filter-items-form">
+                            @csrf
+                            <div class="form-group row">
+                                <div class="col-md-12">
+                                    <label for="filter-items-category" class="mb-0">Category</label>
+                                    <select required id="filter-items-category" style="width: 100%" name="category" class="form-control form-control-lg select2">
+                                        <option value=""></option>
+                                        @foreach($categories as $types)
+                                            <option {{ old('category') == $types->id ? 'selected' : '' }}  value="{{$types->id}}">{{$types->name}}</option>
+                                        @endforeach
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Items Type required
                                     </div>
                                 </div>
-                            </form>
-                        </div>
+                                <div class="col-md-12">
+                                    <label for="filter-items-type" class="mb-0">Item Type</label>
+                                    <select required id="filter-items-type" style="width: 100%" name="type" class="form-control form-control-lg select2">
+                                        <option value=""></option>
+                                        @foreach($item_types as $types)
+                                            <option {{ old('type') == $types->id ? 'selected' : '' }}  value="{{$types->id}}">{{$types->name}}</option>
+                                        @endforeach
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Items Type required
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <label for="filter-items-brand" class="mb-0">Brand</label>
+                                    <select required id="filter-items-brand" style="width: 100%" name="brand" class="form-control form-control-lg select2">
+                                        <option value=""></option>
+                                        @foreach($brands as $types)
+                                            <option {{ old('brand') == $types->id ? 'selected' : '' }}  value="{{$types->id}}">{{$types->name}}</option>
+                                        @endforeach
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Brand required
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <label for="filter-items-area" class="mb-0">Area</label>
+                                    <select required id="filter-items-area" style="width: 100%" name="area" class="form-control form-control-lg select2">
+                                        <option value=""></option>
+                                        @foreach($areas as $types)
+                                            <option {{ old('area') == $types->id ? 'selected' : '' }}  value="{{$types->id}}">{{$types->name}}</option>
+                                        @endforeach
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Area required
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <label for="filter-items-ownership" class="mb-0">Ownership</label>
+                                    <select required id="filter-items-ownership" style="width: 100%" name="ownership" class="form-control form-control-lg select2">
+                                        <option value=""></option>
+                                        @foreach($ownership as $types)
+                                            <option {{ old('ownership') == $types->id ? 'selected' : '' }}  value="{{$types->id}}">{{$types->description}}</option>
+                                        @endforeach
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Ownership required
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <label for="filter-items-status" class="mb-0">Status</label>
+                                    <select required id="filter-items-status" style="width: 100%" name="status" class="form-control form-control-lg select2">
+                                        <option value=""></option>
+                                        @foreach($status as $types)
+                                            <option {{ old('status') == $types->id ? 'selected' : '' }}  value="{{$types->id}}">{{$types->name}}</option>
+                                        @endforeach
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Status required
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
-                <div class="col-md-9">
+            </div>
+            <div class="col-md-9">
+                @if(count($allItems) == 0)
+                    <div class="text-center mt-5 col-md-12">
+                        <h4 class="display font-weight-lighter text-danger">Oops! No item(s) Found</h4>
+                    </div>
+                @else
                     <div class="card bg-transparent border-0 shadow-sm">
                         <div class="card-header bg-transparent  p-0">
                             <span class="float-right">{!! $allItems->fragment(Hash::make(time()))->render() !!}</span>
@@ -136,7 +152,15 @@
                                         </td>
                                         <td>
                                             {{$items->item_type->name}}<br>
-                                            <span class="badge badge-success">{{$items->status->name}}</span>
+                                            @if($items->status->name == "In-Service")
+                                                <span class="badge badge-success">{{$items->status->name}}</span>
+                                            @elseif($items->status->name == "Damaged")
+                                                <span class="badge badge-warning">{{$items->status->name}}</span>
+                                            @elseif($items->status->name == "Lost" || $items->status->name == "Stolen")
+                                                <span class="badge badge-danger">{{$items->status->name}}</span>
+                                            @else
+                                                <span class="badge badge-primary">{{$items->status->name}}</span>
+                                            @endif
                                         </td>
                                     </tr>
                                 @endforeach
@@ -147,8 +171,9 @@
                             <span class="float-right">{!! $allItems->fragment(Hash::make(time()))->render() !!}</span>
                         </div>
                     </div>
-                </div>
-            @endif
+                @endif
+            </div>
+
         </div>
     </div>
     <!-- Modal -->

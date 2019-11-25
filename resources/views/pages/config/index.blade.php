@@ -66,6 +66,13 @@
                                     Sessions
                                 </a>
                             </div>
+                            <hr>
+                            <div class="list-group bg-transparent list-group-horizontal">
+                                <a class="list-group-item text-decoration-none bg-transparent border-right-0 text-muted" href="{{route('designations.index')}}">
+                                    <i class="fa fa-dot-circle"></i><br>
+                                    Designations
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>

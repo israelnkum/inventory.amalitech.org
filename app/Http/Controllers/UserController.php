@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Location;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -22,7 +23,8 @@ class UserController extends Controller
     public function index()
     {
         $users = User::all();
-        return view('pages.config.users.index',compact('users'));
+        $locations = Location::all();
+        return view('pages.config.users.index',compact('users','locations'));
     }
 
     /**
@@ -50,6 +52,7 @@ class UserController extends Controller
         DB::beginTransaction();
         try{
             $user = new User();
+            $user->location_id = $request->location_id;
             $user->name = $request->name;
             $user->email = $request->email;
             $user->password = Hash::make('11111111');
