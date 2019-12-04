@@ -23,12 +23,14 @@
                     </div>
                 </form>
             </div>
-            <div class="col-md-3 text-right">
-                <div class="btn-group" role="group" aria-label="Basic example">
-                    <button type="button" class="btn btn-sm btn-secondary" data-toggle="modal" data-target="#addStudent">Add Trainee</button>
-                    <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#uploadTrainee">Upload Trainee(s)</button>
+            @can('isSuperAdmin')
+                <div class="col-md-3 text-right">
+                    <div class="btn-group" role="group" aria-label="Basic example">
+                        <button type="button" class="btn btn-sm btn-secondary" data-toggle="modal" data-target="#addStudent">Add Trainee</button>
+                        <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#uploadTrainee">Upload Trainee(s)</button>
+                    </div>
                 </div>
-            </div>
+            @endif
         </div>
     </div>
 
@@ -44,18 +46,20 @@
                             @csrf
                             <div class="form-group row">
                                 <div class="form-group row">
-                                    <div class="col-md-12">
-                                        <label for="filter-students-locations" class="mb-0">Location</label>
-                                        <select  required id="filter-students-locations" style="width: 100%" name="location_id" class="form-control form-control-lg select2">
-                                            <option value=""></option>
-                                            @foreach($locations as $types)
-                                                <option {{ old('location_id') == $types->id ? 'selected' : '' }}  value="{{$types->id}}">{{$types->country.", ".$types->city_town}}</option>
-                                            @endforeach
-                                        </select>
-                                        <div class="invalid-feedback">
-                                            Items Type required
+                                    @can('isSuperAdmin')
+                                        <div class="col-md-12">
+                                            <label for="filter-students-locations" class="mb-0">Location</label>
+                                            <select  required id="filter-students-locations" style="width: 100%" name="location_id" class="form-control form-control-lg select2">
+                                                <option value=""></option>
+                                                @foreach($locations as $types)
+                                                    <option {{ old('location_id') == $types->id ? 'selected' : '' }}  value="{{$types->id}}">{{$types->country.", ".$types->city_town}}</option>
+                                                @endforeach
+                                            </select>
+                                            <div class="invalid-feedback">
+                                                Items Type required
+                                            </div>
                                         </div>
-                                    </div>
+                                    @endcan
                                     <div class="col-md-12 mb-2">
                                         <label for="filter-students-gender" class="mb-0">Gender</label>
                                         <select  required id="filter-students-gender" style="width: 100%" name="gender" class="form-control form-control-lg select2">
@@ -100,18 +104,21 @@
                             <span class="float-right">{{ $students->appends(Request::all())->links() }}</span>
                         </div>
                         <div class="card-body">
-                            <table class="table  table-hover">
+{{--                            {!! $students->getOptions() !!}--}}
+                            <table id="students_table" class="table  table-hover">
                                 <tbody>
+
                                 @foreach ($students as $student)
                                     <tr>
                                         <td>
-                                            <img height="auto" width="90" src="{{asset('assets/img/profile/trainees/'.$student->profile)}}" alt="" class="img-fluid">
+                                            <img height="auto" width="70" src="{{asset('assets/img/profile/trainees/'.$student->profile)}}" alt="" class="img-fluid">
                                         </td>
                                         <td class="text-uppercase">
                                             <a class="text-decoration-none text-dark" href="{{route('students.edit',$student->id)."?".Hash::make(time())}}">
 
                                                 <b class="font-weight-bold">{{$student->first_name." ".$student->other_name." ".$student->last_name}}</b><br>
-                                                {{$student->registration_number}}<br>{{$student->phone_number}}<br><span class="text-lowercase">{{$student->email}}</span>
+                                                {{$student->registration_number}}<br>{{$student->phone_number}}<br><span class="text-lowercase">{{$student->personal_email}}</span><br>
+                                                <span class="text-lowercase">{{$student->work_email}}</span>
                                             </a>
                                         </td>
                                         {{--<td>
@@ -141,7 +148,7 @@
     <div class="modal fade" id="addStudent" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
-                <form action="{{route('students.store')}}" enctype="multipart/form-data" method="post" class="needs-validation" novalidate>
+                <form onsubmit="return confirm('Are you sure all information provided are correct')" action="{{route('students.store')}}" enctype="multipart/form-data" method="post" class="needs-validation" novalidate>
                     @csrf
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">New Trainee</h5>
@@ -193,6 +200,13 @@
                                         </div>
                                     </div>
                                     <div class="col-md-4 mb-2">
+                                        <label for="student_id_number" class="mb-0">Student ID Number</label>
+                                        <input type="text" required  class="form-control form-control-sm" name="student_id_number" id="student_id_number" placeholder="ID Number">
+                                        <div class="invalid-feedback">
+                                            ID Number required
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-2">
                                         <label for="email" class="mb-0">Date of Birth</label>
                                         <input type="date" name="date_of_birth" required class="form-control form-control-sm" placeholder="Date of Birth">
                                         <div class="invalid-feedback">
@@ -200,10 +214,17 @@
                                         </div>
                                     </div>
                                     <div class="col-md-4 ">
-                                        <label for="email" class="mb-0">Email</label>
-                                        <input type="email" required class="form-control form-control-sm" name="email" id="email" placeholder="Email">
+                                        <label for="personal_email" class="mb-0">Personal Email</label>
+                                        <input type="email" required class="form-control form-control-sm" name="personal_email" id="personal_email" placeholder="Personal Email">
                                         <div class="invalid-feedback">
                                             Email required
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 ">
+                                        <label for="work_email" class="mb-0">Work Email</label>
+                                        <input type="email"  class="form-control form-control-sm" name="work_email" id="work_email" placeholder="Work Email">
+                                        <div class="invalid-feedback">
+                                            Work required
                                         </div>
                                     </div>
                                     <div class="col-md-4 mb-2">
@@ -217,19 +238,7 @@
                                             Gender required
                                         </div>
                                     </div>
-                                    <div class="col-md-6 mb-2">
-                                        <label for="Specialization" class="mb-0">Specialization</label>
-                                        <select required id="Specialization" style="width: 100%" name="program" class="form-control form-control-lg select2">
-                                            <option value=""></option>
-                                            @foreach($programs as $program)
-                                                <option value="{{$program->id}}">{{$program->name}}</option>
-                                            @endforeach
-                                        </select>
-                                        <div class="invalid-feedback">
-                                            Program required
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 mb-2">
+                                    <div class="col-md-4 mb-2">
                                         <label for="st_session" class="mb-0">Session</label>
                                         <select required id="st_session" style="width: 100%" name="session_id" class="form-control form-control-lg select2">
                                             <option value=""></option>
@@ -241,14 +250,26 @@
                                             Session required
                                         </div>
                                     </div>
-                                    <div class="col-md-6 mb-2">
+                                    <div class="col-md-4 mb-2">
                                         <label for="phone_number" class="mb-0">Phone Number</label>
                                         <input type="text" required  class="form-control form-control-sm" name="phone_number" id="phone_number" placeholder="Phone Number">
                                         <div class="invalid-feedback">
                                             Phone Number required
                                         </div>
                                     </div>
-                                    <div class="col-md-6 mb-2">
+                                    <div class="col-md-4 mb-2">
+                                        <label for="Specialization" class="mb-0">Specialization</label>
+                                        <select required id="Specialization" style="width: 100%" name="program" class="form-control form-control-lg select2">
+                                            <option value=""></option>
+                                            @foreach($programs as $program)
+                                                <option value="{{$program->id}}">{{$program->name}}</option>
+                                            @endforeach
+                                        </select>
+                                        <div class="invalid-feedback">
+                                            Specialization required
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-2">
                                         <label for="st_location" class="mb-0">Location</label>
                                         <select required id="st_location" style="width: 100%" name="location_id" class="form-control form-control-lg select2">
                                             <option value=""></option>
@@ -292,7 +313,7 @@
                             <div class="col-md-7">
                                 <div class="form-row">
                                     <div class="col-md-12 mb-2">
-                                        <label for="selectPictures">Choose Picture(s)</label>
+                                        <label for="selectPictures">Select Picture(s)</label>
                                         <input required class="form-control-file p-1" name="pictures[]" multiple accept="image/*" id="selectPictures" style="width:100%; border-radius: 0;border: dashed black 1px;" type="file">
                                         <div class="invalid-feedback">
                                             Select Picture(s)
@@ -349,15 +370,19 @@
                             </div>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Upload</button>
+                    <div class="row p-2 border-top">
+                        <div class="col-md-6">
+                            <a href="{{route('format-trainees')}}" class="text-decoration-none text-danger ml-2">Download upload Format</a>
+                        </div>
+                        <div class="col-md-6 text-right">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Upload</button>
+                        </div>
                     </div>
                 </form>
             </div>
 
         </div>
     </div>
-
     {{--end modal--}}
 @endsection

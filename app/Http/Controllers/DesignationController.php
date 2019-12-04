@@ -6,6 +6,7 @@ use App\Designation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 class DesignationController extends Controller
 {
@@ -20,6 +21,9 @@ class DesignationController extends Controller
      */
     public function index()
     {
+        if (!Gate::allows('canLogin')) {
+            abort(503,'Account Deactivated! Contact your Administrator');
+        }
         $designations = Designation::all();
         return view('pages.config.designation.index',compact('designations'));
     }
@@ -44,7 +48,7 @@ class DesignationController extends Controller
     {
         $check = Designation::where('Designation',$request->designation)->first();
         if (!empty($check)){
-            return back()->with('error','Designation already exit');
+            return back()->with('error','Designation already exist');
         }
         DB::beginTransaction();
         try{

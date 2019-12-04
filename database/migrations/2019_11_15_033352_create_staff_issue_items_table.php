@@ -20,9 +20,9 @@ class CreateStaffIssueItemsTable extends Migration
             $table->longText('issue_remarks');
             $table->string('date_collected');
             $table->string('issued_by');
-            $table->longText('return_remarks');
-            $table->string('dated_returned');
-            $table->string('received_by');
+            $table->longText('return_remarks')->nullable();
+            $table->string('date_returned')->nullable();
+            $table->string('received_by')->nullable();
             $table->timestamps();
         });
     }

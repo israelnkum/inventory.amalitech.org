@@ -16,6 +16,7 @@ class CreateItemsTable extends Migration
         Schema::create('items', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('asset_tag_number');
+            $table->integer('staff');
             $table->integer('location_id');
             $table->integer('category_id');
             $table->integer('item_type_id');
@@ -23,12 +24,13 @@ class CreateItemsTable extends Migration
             $table->integer('ownership_id');
             $table->integer('area_id');
             $table->longText('description');
-            $table->integer('statuses_id');
+            $table->integer('status_id');
             $table->longText('remarks')->nullable();
             $table->string('date_purchased');
             $table->string('picture')->default('item-default.jpg');
             $table->string('qr_code');
             $table->integer('user_id');
+            $table->string('current_person')->nullable();
             $table->timestamps();
         });
     }

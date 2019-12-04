@@ -113,6 +113,20 @@
                                         Status required
                                     </div>
                                 </div>
+                                @can('isSuperAdmin')
+                                    <div class="col-md-12">
+                                        <label for="filter-items-locations" class="mb-0">Location</label>
+                                        <select  required id="filter-items-locations" style="width: 100%" name="location_id" class="form-control form-control-lg select2">
+                                            <option value=""></option>
+                                            @foreach($locations as $types)
+                                                <option {{ old('location_id') == $types->id ? 'selected' : '' }}  value="{{$types->id}}">{{$types->country.", ".$types->city_town}}</option>
+                                            @endforeach
+                                        </select>
+                                        <div class="invalid-feedback">
+                                            Items Type required
+                                        </div>
+                                    </div>
+                                @endcan
                             </div>
                         </form>
                     </div>
@@ -121,6 +135,7 @@
             <div class="col-md-9">
                 @if(count($allItems) == 0)
                     <div class="text-center mt-5 col-md-12">
+                        <img src="{{'no_result.png'}}" alt="">
                         <h4 class="display font-weight-lighter text-danger">Oops! No item(s) Found</h4>
                     </div>
                 @else
@@ -134,7 +149,7 @@
                                 <tr>
                                     <th>Picture</th>
                                     <th>Asset Tag/Description</th>
-                                    <th>Type/Status</th>
+                                    <th>Type/Area</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -152,15 +167,7 @@
                                         </td>
                                         <td>
                                             {{$items->item_type->name}}<br>
-                                            @if($items->status->name == "In-Service")
-                                                <span class="badge badge-success">{{$items->status->name}}</span>
-                                            @elseif($items->status->name == "Damaged")
-                                                <span class="badge badge-warning">{{$items->status->name}}</span>
-                                            @elseif($items->status->name == "Lost" || $items->status->name == "Stolen")
-                                                <span class="badge badge-danger">{{$items->status->name}}</span>
-                                            @else
-                                                <span class="badge badge-primary">{{$items->status->name}}</span>
-                                            @endif
+                                            <span class="badge badge-dark p-1">{{$items->area->name}}</span>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -191,16 +198,44 @@
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-md-3">
-                                <p class="text-danger text-center" id="displayItemError"> <b><span id="boldertext"></span></b></p>
-                                <div class="picture-container">
-                                    <div class="picture">
-                                        <img alt="" src="{{asset('item-default.jpg')}}" class="picture-src img-fluid" id="itemPicturePreview" title="Click to select picture" />
-                                        <input required  type="file" class="form-control" name="image_file" accept="image/*"   id="item-picture">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <p class="text-danger text-center" id="displayItemError"> <b><span id="boldertext"></span></b></p>
+                                        <div class="picture-container">
+                                            <div class="picture">
+                                                <img alt="" src="{{asset('item-default.jpg')}}" class="picture-src img-fluid" id="itemPicturePreview" title="Click to select picture" />
+                                                <input  type="file" class="form-control" name="image_file" accept="image/*"   id="item-picture">
+                                            </div>
+                                            <h6>Choose Item Picture</h6>
+                                            <small class="text-danger">
+                                                Max Size - 500KB
+                                            </small>
+                                        </div>
                                     </div>
-                                    <h6>Choose Item Picture</h6>
-                                    <small class="text-danger">
-                                        Max Size - 500KB
-                                    </small>
+                                    <div class="col-md-12 ">
+                                        <label for="location_id">Location</label>
+                                        <select  required id="location_id" style="width: 100%" name="location_id" class="form-control form-control-lg select2">
+                                            <option value=""></option>
+                                            @foreach($locations as $types)
+                                                <option {{ old('location_id') == $types->id ? 'selected' : '' }}  value="{{$types->id}}">{{$types->country.", ".$types->city_town}}</option>
+                                            @endforeach
+                                        </select>
+                                        <div class="invalid-feedback">
+                                            Items Type required
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label for="add-in-charge">In-Charge</label>
+                                        <select required id="add-in-charge" style="width: 100%" name="in_charge" class="form-control form-control-lg select2">
+                                            <option value=""></option>
+                                            @foreach($staff as $types)
+                                                <option value="{{$types->id}}">{{$types->first_name." ".$types->other_name." ".$types->last_name}}</option>
+                                            @endforeach
+                                        </select>
+                                        <div class="invalid-feedback">
+                                            In-Charge required
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-md-9">
@@ -265,7 +300,9 @@
                                         <select required id="status" style="width: 100%" name="status" class="form-control form-control-lg select2">
                                             <option value=""></option>
                                             @foreach($status as $types)
-                                                <option value="{{$types->id}}">{{$types->name}}</option>
+                                                @if($types->name != "In-Use")
+                                                    <option value="{{$types->id}}">{{$types->name}}</option>
+                                                @endif
                                             @endforeach
                                         </select>
                                         <div class="invalid-feedback">
@@ -311,11 +348,159 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Add items</button>
+                        <button type="submit" class="btn btn-primary">Add Item</button>
                     </div>
                 </form>
             </div>
 
         </div>
     </div>
+
+
+    {{--upload modal--}}
+    <div class="modal fade" id="uploadTrainee" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form action="{{route('upload-items')}}" enctype="multipart/form-data" method="post" class="needs-validation" novalidate>
+                    @csrf
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Upload Item(s)</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-row">
+                            <div class="col-md-4 mb-2">
+                                <label for="upload-type" class="mb-0">Item Type</label>
+                                <select required id="upload-type" style="width: 100%" name="type" class="form-control form-control-lg select2">
+                                    <option value=""></option>
+                                    @foreach($item_types as $types)
+                                        <option value="{{$types->id}}">{{$types->name}}</option>
+                                    @endforeach
+                                </select>
+                                <div class="invalid-feedback">
+                                    Items Type required
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <label for="upload-brand" class="mb-0">Brand</label>
+                                <select required id="upload-brand" style="width: 100%" name="brand" class="form-control form-control-lg select2">
+                                    <option value=""></option>
+                                    @foreach($brands as $types)
+                                        <option value="{{$types->id}}">{{$types->name}}</option>
+                                    @endforeach
+                                </select>
+                                <div class="invalid-feedback">
+                                    Brand required
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <label for="upload-area" class="mb-0">Area</label>
+                                <select required id="upload-area" style="width: 100%" name="area" class="form-control form-control-lg select2">
+                                    <option value=""></option>
+                                    @foreach($areas as $types)
+                                        <option value="{{$types->id}}">{{$types->name}}</option>
+                                    @endforeach
+                                </select>
+                                <div class="invalid-feedback">
+                                    Area required
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <label for="upload-ownership" class="mb-0">Ownership</label>
+                                <select required id="upload-ownership" style="width: 100%" name="ownership" class="form-control form-control-lg select2">
+                                    <option value=""></option>
+                                    @foreach($ownership as $types)
+                                        <option value="{{$types->id}}">{{$types->description}}</option>
+                                    @endforeach
+                                </select>
+                                <div class="invalid-feedback">
+                                    Ownership required
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <label for="upload-status" class="mb-0">Status</label>
+                                <select required id="upload-status" style="width: 100%" name="status" class="form-control form-control-lg select2">
+                                    <option value=""></option>
+                                    @foreach($status as $types)
+                                        @if($types->name != "In-Use")
+                                            <option value="{{$types->id}}">{{$types->name}}</option>
+                                        @endif
+                                    @endforeach
+                                </select>
+                                <div class="invalid-feedback">
+                                    Status required
+                                </div>
+                            </div>
+
+                            <div class="col-md-4 mb-2">
+                                <label for="upload-category" class="mb-0">Category</label>
+                                <select required id="upload-category" style="width: 100%" name="category" class="form-control form-control-lg select2">
+                                    <option value=""></option>
+                                    @foreach($categories as $types)
+                                        <option value="{{$types->id}}">{{$types->name}}</option>
+                                    @endforeach
+                                </select>
+                                <div class="invalid-feedback">
+                                    Category required
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label for="upload-location">Location</label>
+                                <select required id="upload-location" style="width: 100%" name="location_id" class="form-control form-control-lg select2">
+                                    <option value=""></option>
+                                    @foreach($locations as $location)
+                                        <option value="{{$location->id}}">{{$location->city_town.','.$location->country}}</option>
+                                    @endforeach
+                                </select>
+                                <div class="invalid-feedback">
+                                    Location required
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label for="in-charge">In-Charge</label>
+                                <select required id="in-charge" style="width: 100%" name="in_charge" class="form-control form-control-lg select2">
+                                    <option value=""></option>
+                                    @foreach($staff as $types)
+                                        <option value="{{$types->id}}">{{$types->first_name." ".$types->other_name." ".$types->last_name}}</option>
+                                    @endforeach
+                                </select>
+                                <div class="invalid-feedback">
+                                    In-Charge required
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label for="excelFile">Select Excel File</label>
+                                <input required name="file" class="form-control-file p-1" id="excelFile" style="width:100%; border-radius: 0;border: dashed black 1px;" type="file">
+                                <div class="invalid-feedback">
+                                    Select File
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label for="selectPictures">Select Picture(s)</label>
+                                <input required class="form-control-file p-1" name="pictures[]" multiple="multiple" accept="image/*" id="selectPictures" style="width:100%; border-radius: 0;border: dashed black 1px;" type="file">
+                                <div class="invalid-feedback">
+                                    Select Picture(s)
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                    <div class="row p-2 border-top">
+                        <div class="col-md-6">
+                            <a href="{{route('format-items')}}" class="text-decoration-none text-danger ml-2">Download upload Format</a>
+                        </div>
+                        <div class="col-md-6 text-right">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Upload</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+    {{--end modal--}}
 @endsection

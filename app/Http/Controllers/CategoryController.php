@@ -6,6 +6,7 @@ use App\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 class CategoryController extends Controller
 {
@@ -20,6 +21,9 @@ class CategoryController extends Controller
      */
     public function index()
     {
+        if (!Gate::allows('canLogin')) {
+            abort(503,'Account Deactivated! Contact your Administrator');
+        }
         $categories = Category::all();
         return view('pages.config.categories.index',compact('categories'));
     }
@@ -44,7 +48,7 @@ class CategoryController extends Controller
     {
         $check = Category::where('name',$request->category_name)->first();
         if (!empty($check)){
-            return back()->with('error','Category already exit');
+            return back()->with('error','Category already exist');
         }
         DB::beginTransaction();
         try{

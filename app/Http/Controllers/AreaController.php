@@ -6,9 +6,11 @@ use App\Area;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 class AreaController extends Controller
 {
+
     public function __construct()
     {
         $this->middleware('auth');
@@ -20,6 +22,9 @@ class AreaController extends Controller
      */
     public function index()
     {
+        if (!Gate::allows('canLogin')) {
+            abort(503,'Account Deactivated! Contact your Administrator');
+        }
         $areas = Area::all();
         return view('pages.config.areas.index',compact('areas'));
     }
@@ -44,7 +49,7 @@ class AreaController extends Controller
     {
         $check = Area::where('name',$request->area_name)->first();
         if (!empty($check)){
-            return back()->with('error','Area already exit');
+            return back()->with('error','Area already exist');
         }
         DB::beginTransaction();
         try{

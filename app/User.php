@@ -10,13 +10,16 @@ class User extends Authenticatable
 {
     use Notifiable;
 
+    public function location(){
+        return $this->belongsTo('App\Location');
+    }
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'name','location_id','gender', 'email','user_type','updated', 'password','picture',
+        'name','location_id','gender', 'email','user_type','updated', 'password','picture','status',
     ];
 
     /**

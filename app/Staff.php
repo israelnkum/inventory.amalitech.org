@@ -14,7 +14,14 @@ class Staff extends Model
         return $this->hasMany('App\ProgramTeaching');
     }
 
-    public function designation(){
-        return $this->belongsTo('App\Designation');
+    public function staff_designation(){
+        return $this->hasMany('App\StaffDesignation');
+    }
+    public function staff_issue_item(){
+        return $this->hasMany('App\StaffIssueItem');
+    }
+
+    public function items(){
+        return $this->hasMany('App\Item');
     }
 }

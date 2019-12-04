@@ -25,4 +25,16 @@ class Item extends Model
     public function status(){
         return $this->belongsTo('App\Status');
     }
+
+    public function staff(){
+        return $this->belongsTo('App\Staff');
+    }
+
+    public function staff_issued_items(){
+        return $this->hasMany('App\StaffIssueItem');
+    }
+
+    public function student_issued_items(){
+        return $this->hasMany('App\StudentIssueItem');
+    }
 }

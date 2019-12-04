@@ -31,6 +31,27 @@
                         </form>
                     </div>
                 </div>
+                <div class="card mt-5 border-0 shadow-sm bg-transparent">
+                    <div class="card-header p-2">
+                        Default Area
+                    </div>
+                    <div class="card-body">
+                        <table class="table-borderless table-striped table">
+                            <tbody>
+                            @php($i=1)
+                            @foreach($areas as $area)
+                                @if($area->name == "Store")
+                                    <tr>
+                                        <td>{{$i}}</td>
+                                        <td>{{$area->name}}</td>
+                                    </tr>
+                                @endif
+                                @php($i++)
+                            @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
             <div class="col-md-8">
                 <div class="card border-0 shadow-sm bg-transparent">
@@ -62,8 +83,9 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                @php($i=1)
+                                @php($i=0)
                                 @foreach($areas as $area)
+                                    @if($area->name != "Store")
                                     <tr>
                                         <td></td>
                                         <td>{{$i}}</td>
@@ -75,6 +97,7 @@
                                             </a>
                                         </td>
                                     </tr>
+                                    @endif
                                     @php($i++)
                                 @endforeach
                                 </tbody>

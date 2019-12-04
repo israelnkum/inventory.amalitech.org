@@ -17,6 +17,12 @@
     }, false);
 })();
 $(document).ready(function () {
+
+    $('input[type=submit]').click(function() {
+        $(this).attr('disabled', 'disabled');
+        // $(this).parents('form').submit();
+    });
+
     $('#session_name').mask(new Date().getFullYear()+'-~~',);
     $('#phone_number').mask('+233 ~~~ ~~ ~~~~',);
     window.setTimeout(function () {
@@ -25,7 +31,9 @@ $(document).ready(function () {
         });
     },5000);
 
-    $("#programs").DataTable({
+
+    //program_table
+    let programs_table=  $("#programs_table").DataTable({
         columnDefs: [ {
             orderable: false,
             className: 'select-checkbox',
@@ -37,7 +45,54 @@ $(document).ready(function () {
         }, order: [[ 1, 'asc' ]]
     });
 
+    programs_table.column(2).visible(false);
+    programs_table.on('click','.edit',function () {
 
+        let  $tr = $(this).closest('tr');
+
+        if ($($tr).hasClass('child')){
+            $tr = $tr.prev('.parent');
+        }
+
+
+        let data = programs_table.row($tr).data();
+
+
+        $('#edit-program-name').val(data[3]);
+        $('#edit-prefix').val(data[4]);
+
+        $('#edit-program-form').attr('action', 'programs/'+data[2]);
+        $('#edit-program-modal').modal('show');
+        $('#program-title').text(data[3]);
+    });
+
+    //delete program
+    let program_ids =[];
+    $('#programs_table tbody').on( 'click', 'td:first-child', function () {
+
+        let  $tr = $(this).closest('tr');
+        if ($($tr).hasClass('child')){
+            $tr = $tr.prev('.parent');
+        }
+        let data = programs_table.row($tr).data();
+        if (!program_ids.includes(data[2])){
+            program_ids.push(data[2]);
+        }else{
+            for( let i = 0; i < program_ids.length; i++){
+                if ( program_ids[i] === data[2]) {
+                    program_ids.splice(i, 1);
+                }
+            }
+        }
+        if (program_ids.length >0){
+            $('#btn-delete-program').removeAttr('disabled');
+        }  else{
+            $('#btn-delete-program').attr('disabled','disabled');
+
+        }
+        $("#program_ids").val(category_ids);
+    } );
+//End Program Table
 
     /*
     Category Table
@@ -429,9 +484,16 @@ status Table
     //End status Table
 
 
-    /*
-item type Table
-*/
+
+    /*users Table*/
+    let users_table =  $("#users_table").DataTable();
+    users_table.column(1).visible(false);
+
+    //End users Table
+
+
+
+    /*item type Table*/
     let item_type_table =  $("#item_type_table").DataTable({
         columnDefs: [ {
             orderable: false,
@@ -458,7 +520,7 @@ item type Table
 
         $('#edit-item_type_name').val(data[3]);
 
-        $('#edit-item-type-form').attr('action', 'status/'+data[2]);
+        $('#edit-item-type-form').attr('action', 'item-type/'+data[2]);
         $('#edit-item-type-modal').modal('show');
         $('#item-type-title').text(data[3]);
     });
@@ -527,7 +589,7 @@ Sessions type Table
     });
 
 
-    //delete Ownership
+    //delete Sessions
     let session_ids =[];
     $('#session_table tbody').on( 'click', 'td:first-child', function () {
 
@@ -688,6 +750,27 @@ Sessions type Table
     });
 
 
+
+    //filter store items
+    $('#filter-store-category').change(function () {
+        $('#filter-store-form').submit();
+    });
+    $('#filter-store-type').change(function () {
+        $('#filter-store-form').submit();
+    });
+    $('#filter-store-brand').change(function () {
+        $('#filter-store-form').submit();
+    });
+    $('#filter-store-area').change(function () {
+        $('#filter-store-form').submit();
+    });
+    $('#filter-store-ownership').change(function () {
+        $('#filter-store-form').submit();
+    });
+    $('#filter-store-status').change(function () {
+        $('#filter-store-form').submit();
+    });
+
     //filter staff
     $('#filter-trainer-locations').change(function () {
         $('#filter-trainers-form').submit();
@@ -699,6 +782,44 @@ Sessions type Table
     $('#filter-trainer-designation').change(function () {
         $('#filter-trainers-form').submit();
     });
+//end staff filter
 
+
+    let searchTable = $("#search-results-table").DataTable({
+        dom:'t'
+    });
+    $('#search-result-input').keyup(function(){
+        searchTable.search($(this).val()).draw() ;
+    });
+
+
+//filter users
+    $('#filter-users-locations').change(function () {
+        $('#filter-users-form').submit();
+    });
+    $('#filter-users-gender').change(function () {
+        $('#filter-users-form').submit();
+    });
+
+    $('#filter-user-type').change(function () {
+        $('#filter-users-form').submit();
+    });
+
+    $('#filter-users-status').change(function () {
+        $('#filter-users-form').submit();
+    });
+    //end user filter
+
+
+
+    $('#can_login').click(function () {
+        if (!$(this).is(':checked')){
+            $('.class-user-type').fadeOut(1000).slideUp(1000);
+            $('#user_type').removeAttr('required');
+        }else{
+            $('#user_type').attr('required', true);
+            $('.class-user-type').fadeIn(1000).slideDown(1000);
+        }
+    });
 
 });

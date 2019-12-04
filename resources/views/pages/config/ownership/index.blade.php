@@ -27,7 +27,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <button type="submit" class="btn btn-primary">Add Ownerships</button>
+                            <button type="submit" class="btn btn-primary">Add Ownership</button>
                         </form>
                     </div>
                 </div>

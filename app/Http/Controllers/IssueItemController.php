@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class IssueItemController extends Controller
 {
@@ -13,7 +14,9 @@ class IssueItemController extends Controller
      */
     public function index()
     {
-        //
+        if (!Gate::allows('canLogin')) {
+            abort(503,'Account Deactivated! Contact your Administrator');
+        }
     }
 
     /**

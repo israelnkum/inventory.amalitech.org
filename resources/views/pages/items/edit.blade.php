@@ -10,12 +10,13 @@
                     <a href="{{route('items.edit',$item->id)."?".Hash::make(time())}}">{{$item->asset_tag_number}}</a>
                 </li>
             @endcomponent
-            <div class="col-md-7">
+            <div class="col-md-8">
                 <div class="card bg-transparent border-0 shadow-sm">
                     <div class="card-header p-2">
                         Item Detail
-
-                        <a href="javascript:void(0)" data-toggle="modal" data-target="#addStudent" class="btn btn-link p-0 float-right">Edit info</a>
+                        @can('isSuperAdmin')
+                            <a href="javascript:void(0)" data-toggle="modal" data-target="#addStudent" class="btn btn-link p-0 float-right">Edit info</a>
+                        @endcan
                     </div>
                     <div class="card-body">
                         <div class="row">
@@ -28,30 +29,33 @@
                                         <p>
                                             {{$item->asset_tag_number}}<br>
                                             {{$item->item_type->name}}<br>
-                                            <span class="badge badge-success">{{$item->status->name}}</span>
+                                            <span class="badge badge-primary">{{$item->status->name}}</span>
                                         </p>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <form onsubmit="return confirm('Do you really want to delete?')" action="{{route('items.destroy',$item->id)}}" method="post">
-                                    @csrf
-                                    {!! @method_field('delete') !!}
-                                    <button class="btn btn-link text-danger text-decoration-none" type="submit"><i class="fa fa-trash-alt"></i> Delete</button>
-                                </form>
+                                <img class="img-fluid" height="auto" width="100"  src="{{asset('assets/qr_codes/items/'.$item->qr_code)}}" alt="">
+                                @can('isSuperAdmin')
+                                    <form onsubmit="return confirm('Do you really want to delete?')" action="{{route('items.destroy',$item->id)}}" method="post">
+                                        @csrf
+                                        {!! @method_field('delete') !!}
+                                        <button  @if($item->status->name == "In-Use") disabled @endif class="btn btn-link text-danger text-decoration-none" type="submit"><i class="fa fa-trash-alt"></i> Delete</button>
+                                    </form>
+                                @endcan
                             </div>
                         </div>
                         <hr>
                         <div class="">
-                            <div class="mt-5">
+                            <blockquote class=" blockquote">
                                 <p class="mb-0 font-weight-bold">Description</p>
                                 {{$item->description}}
-                            </div>
-                            <div class="mt-3">
+                            </blockquote>
+                            <blockquote class="mt-3 blockquote">
                                 <p class="mb-0 font-weight-bold">Remarks</p>
                                 {{$item->remarks}}
-                            </div>
-                            <div class="mt-3">
+                            </blockquote>
+                            <div class="mt-3 blockquote font-weight-lighter">
                                 <div class="row">
                                     <div class="col-md-6">
                                         <p class="mb-0 font-weight-bold">Ownership</p>
@@ -63,7 +67,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="mt-3">
+                            <div class="mt-3 blockquote">
                                 <div class="row">
                                     <div class="col-md-6">
                                         <p class="mb-0 font-weight-bold">Date Purchased</p>
@@ -79,13 +83,113 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-5">
+            <div class="col-md-4">
                 <div class="card bg-transparent border-0 shadow-sm">
                     <div class="card-header p-2">
                         Activity
                     </div>
-                    <div class="card-body">
-                        <img  src="{{asset('assets/qr_codes/items/'.$item->qr_code)}}" alt="">
+                    <div class="card-body ">
+                        @if(count($item->staff_issued_items) == 0 && count($item->student_issued_items) ==0)
+                            No Activity Yet
+                        @else
+                            <div class="accordion" id="accordionExample">
+                                @foreach($item->student_issued_items as $student_issue)
+                                    <a href="javascript:void(0)" class="font-weight-bold text-dark text-decoration-none" data-toggle="collapse" data-target="#std{{$student_issue->id}}" aria-expanded="true" aria-controls="collapseOne">
+                                        {{$student_issue->date_collected}}  <span class="bg-dark text-white p-1">Trainee</span>
+                                    </a>
+                                    <div id="std{{$student_issue->id}}" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between">
+                                                <span class="font-weight-bold">Name:</span>
+                                                {{$student_issue->student->first_name." ".$student_issue->student->other_name." ".$student_issue->student->last_name}}
+                                            </div>
+                                            <div class="d-flex justify-content-between">
+                                                <span class="font-weight-bold">Student ID:</span>
+                                                {{$student_issue->student->student_number}}
+                                            </div>
+                                            <div class="d-flex justify-content-between">
+                                                <span class="font-weight-bold">Issued By:</span>
+                                                {{$student_issue->issued_by}}
+                                            </div>
+                                            <div class="d-flex justify-content-between">
+                                                <span class="font-weight-bold">Remarks:</span>
+                                                {{$student_issue->issue_remarks}}
+                                            </div>
+                                            @if($student_issue->date_returned =="")
+                                                <span class="text-danger">Not Yet Returned</span>
+                                            @else
+                                                <div class="d-flex justify-content-between">
+                                                    <span class="font-weight-bold">Date returned:</span>
+                                                    {{$student_issue->date_returned}}
+                                                </div>
+                                                <div class="d-flex justify-content-between">
+                                                    <span class="font-weight-bold">Remarks:</span>
+                                                    {{$student_issue->return_remarks}}
+                                                </div>
+                                                <div class="d-flex justify-content-between">
+                                                    <span class="font-weight-bold">Received By:</span>
+                                                    {{$student_issue->received_by}}
+                                                </div>
+                                            @endif
+                                            <div class="text-right">
+                                                <a href="{{route('students.edit',$student_issue->student->id)}}" class="btn btn-sm btn-dark">View Trainee</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                                <hr>
+                                @foreach($item->staff_issued_items as $staff_issue)
+                                    <a href="javascript:void(0)" class="font-weight-bold text-dark text-decoration-none" data-toggle="collapse" data-target="#stf{{$staff_issue->id}}" aria-expanded="true" aria-controls="collapseOne">
+                                        {{$staff_issue->date_collected}}  <span class="bg-dark text-white p-1">Staff</span>
+                                    </a>
+
+                                    <div id="stf{{$staff_issue->id}}" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
+                                        <div class="d-flex justify-content-between">
+                                            <span class="font-weight-bold">Name:</span>
+                                            {{$staff_issue->staff->first_name." ".$staff_issue->staff->other_name." ".$staff_issue->staff->last_name}}
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <span class="font-weight-bold">Staff ID:</span>
+                                            {{$staff_issue->staff->staff_number}}
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <span class="font-weight-bold">Issued By:</span>
+                                            {{$staff_issue->issued_by}}
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <span class="font-weight-bold">Remarks:</span>
+                                            {{$staff_issue->issue_remarks}}
+                                        </div>
+                                        @if($staff_issue->date_returned =="")
+                                            <span class="text-danger">Not Yet Returned</span>
+                                        @else
+                                            <div class="d-flex justify-content-between">
+                                                <span class="font-weight-bold">Date returned:</span>
+                                                {{$staff_issue->date_returned}}
+                                            </div>
+                                            <div class="d-flex justify-content-between">
+                                                <span class="font-weight-bold">Remarks:</span>
+                                                {{$staff_issue->return_remarks}}
+                                            </div>
+                                            <div class="d-flex justify-content-between">
+                                                <span class="font-weight-bold">Received By:</span>
+                                                {{$staff_issue->received_by}}
+                                            </div>
+                                        @endif
+                                        <div class="text-right">
+                                            <a href="{{route('staff.edit',$staff_issue->staff->id)}}" class="btn btn-sm btn-dark">View Staff</a>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+
+                    <div class="card-header p-2">
+                        In-Charge
+                    </div>
+                    <div class="card-body ">
+                        {{$item->staff->first_name." ".$item->staff->other_name." ".$item->staff->last_name}}
                     </div>
                 </div>
             </div>

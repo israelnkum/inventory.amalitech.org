@@ -12392,6 +12392,15 @@ div.dataTables_wrapper span.select-item {
   width: 100%;
 }
 
+html,
+body {
+  font-family: Helvetica, Arial, sans-serif;
+}
+
+.dash-list:hover {
+  box-shadow: 0 0 0 0.2rem rgba(0, 0, 0, 0.2);
+}
+
 /*!
  * Font Awesome Free 5.11.2 by @fontawesome - https://fontawesome.com
  * License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License)

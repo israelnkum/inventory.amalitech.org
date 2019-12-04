@@ -6,9 +6,14 @@ use App\Location;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 class LocationController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -16,6 +21,12 @@ class LocationController extends Controller
      */
     public function index()
     {
+        if (!Gate::allows('canLogin')) {
+            abort(503,'Account Deactivated! Contact your Administrator');
+        }
+        if (!Gate::allows('isSuperAdmin')) {
+            abort(503,'You may not have access! Contact your Administrator');
+        }
         $locations = Location::all();
         return view('pages.config.locations.index',compact('locations'));
     }

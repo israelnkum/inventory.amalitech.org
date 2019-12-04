@@ -14,6 +14,7 @@ use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 class ProgramController extends Controller
 {
@@ -29,6 +30,12 @@ class ProgramController extends Controller
      */
     public function index()
     {
+        if (!Gate::allows('canLogin')) {
+            abort(503,'Account Deactivated! Contact your Administrator');
+        }
+        if (!Gate::allows('isSuperAdmin')) {
+            abort(503,'You may not have access! Contact your Administrator');
+        }
         $allPrograms = Program::all();
         return view('pages.config.programs.index',compact('allPrograms'));
     }
@@ -55,7 +62,7 @@ class ProgramController extends Controller
         $status = Status::all()->count();
         return view('pages.config.index',
             compact('users','programs','locations','categories','areas','itemType',
-            'brand','ownership','status'));
+                'brand','ownership','status'));
     }
     /**
      * Store a newly created resource in storage.
@@ -99,6 +106,20 @@ class ProgramController extends Controller
         //
     }
 
+    public function deleteProgram(Request $request){
+        $selected_id = explode(',',$request->input('selected_ids'));;
+        DB::beginTransaction();
+        try{
+            foreach ($selected_id as $value){
+                $program = Program::find($value);
+                $program->delete();
+            }
+            return back()->with('success',count($selected_id).' Program Deleted');
+        }catch (\Exception $exception){
+            return back()->with('warning',count($selected_id).' Something Deleted');
+        }
+
+    }
     /**
      * Show the form for editing the specified resource.
      *
@@ -119,7 +140,20 @@ class ProgramController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        DB::beginTransaction();
+        try{
+            $program = Program::find($id);
+            $program->name = $request->program_name;
+            $program->prefix = strtoupper($request->prefix);
+
+            if ($program->save()){
+                DB::commit();
+                return back()->with('success','Program Updated');
+            }
+        }catch (\Exception $exception){
+            DB::rollBack();
+            return back()->with('warning','Something went wrong, Try Again');
+        }
     }
 
     /**

@@ -6,6 +6,7 @@ use App\ItemType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 class ItemTypeController extends Controller
 {
@@ -20,6 +21,12 @@ class ItemTypeController extends Controller
      */
     public function index()
     {
+        if (!Gate::allows('canLogin')) {
+            abort(503,'Account Deactivated! Contact your Administrator');
+        }
+        if (!Gate::allows('isSuperAdmin')) {
+            abort(503,'You may not have access! Contact your Administrator');
+        }
         $item_types = ItemType::all();
         return view('pages.config.item_type.index',compact('item_types'));
     }
@@ -42,9 +49,9 @@ class ItemTypeController extends Controller
      */
     public function store(Request $request)
     {
-        $check = ItemType::where('name',$request->area_name)->first();
+        $check = ItemType::where('name',$request->item_type)->first();
         if (!empty($check)){
-            return back()->with('error','Area already exit');
+            return back()->with('error','Item Type already exist');
         }
         DB::beginTransaction();
         try{
@@ -97,7 +104,7 @@ class ItemTypeController extends Controller
         DB::beginTransaction();
         try{
             $item_type =  ItemType::find($id);
-            $item_type->name = $request->item_type;
+            $item_type->name = $request->item_type_name;
 //            $category->user_id = Auth::user()->id;
             if ($item_type->save()){
                 DB::commit();

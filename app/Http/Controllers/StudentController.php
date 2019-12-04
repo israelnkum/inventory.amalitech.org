@@ -9,8 +9,10 @@ use App\Session;
 use App\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Intervention\Image\Facades\Image;
 use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class StudentController extends Controller
@@ -27,7 +29,13 @@ class StudentController extends Controller
      */
     public function index()
     {
-        $students = Student::simplePaginate(20);
+        if (!Gate::allows('canLogin')) {
+            abort(503,'Account Deactivated! Contact your Administrator');
+        }
+        if (!Gate::allows('isSuperAdmin')) {
+            abort(503,'You may not have access! Contact your Administrator');
+        }
+        $students = Student::simplePaginate(50);
         $programs = Program::all();
         $locations = Location::all();
         $sessions = Session::all();
@@ -53,14 +61,16 @@ class StudentController extends Controller
      */
     public function store(Request $request)
     {
-        $checkEmail = Student::where('email',$request->email)->first();
+        $checkEmail = Student::where('personal_email',$request->personal_email)
+            ->orwhere('work_email',$request->work_email)->first();
         if (!empty($checkEmail)){
             return back()->with('error','A Student with the same Email Exist');
         }
 
         $checkNameAndEmail = Student::where('first_name',$request->first_name)
-            ->where('last_name',$request->last_name)
-            ->where('email',$request->email)->first();
+                ->where('last_name',$request->last_name)
+                ->where('personal_email',$request->personal_email)
+                ->orwhere('work_email',$request->work_email)->first();
 
         if (!empty($checkNameAndEmail)){
             return back()->with('error','A Student with the same Name Exist');
@@ -86,19 +96,18 @@ class StudentController extends Controller
             ->where('session_id',$request->session_id)
             ->get()->count();
 
-        if ($countStudents == 0){
+        /*if ($countStudents == 0){
             $registration_number =  $prefix.$student_number_prefix.'001';
             $student_number =$student_number_prefix. '001';
-        }else{
+        }
+        else{
             $lastStudentRecord = Student::where('location_id',$request->location_id)
                 ->where('program_id',$request->program)->latest('id')->first();
             if (empty($lastStudentRecord)){
                 $registration_number =  $prefix.$student_number_prefix.'001';
                 $student_number =$student_number_prefix. '001';
             } else {
-
                 $lastStudentIdNumber= substr($lastStudentRecord->student_number,5) ;
-
                 if ($lastStudentIdNumber <9){
                     $std_num = $lastStudentIdNumber+1;
                     $student_number =$student_number_prefix."00".$std_num;
@@ -113,21 +122,21 @@ class StudentController extends Controller
                     $registration_number =   $prefix.$student_number;
                 }
             }
-        }
+        }*/
 
         $image = $request->file('image_file');
 
         if ($image != '') {
-            $image_name = $registration_number . '.' . $image->getClientOriginalExtension();
+            $image_name = $prefix.$request->student_id_number . '.' . $image->getClientOriginalExtension();
             $path = public_path('assets/img/profile/trainees/' . $image_name);
             Image::make($image->getRealPath())->resize(413, 531)->save($path);
         }
         /*
          * Generate QR Code
          */
-        QrCode::format('png')
-            ->generate($request->first_name.' '.$request->other_name.' '.$request->last_name.' | '.$student_number,
-                public_path('assets/qr_codes/trainees/'.$registration_number.'.png'));
+        QrCode::format('png')->size(500)->errorCorrection('H')
+            ->generate($request->first_name.' '.$request->other_name.' '.$request->last_name.' | '.strtoupper($request->student_id_number),
+                public_path('assets/qr_codes/trainees/'.strtoupper($prefix.$request->student_id_number).'.png'));
         DB::beginTransaction();
         try{
             $student = new Student();
@@ -139,12 +148,13 @@ class StudentController extends Controller
             $student->other_name = ucfirst($request->other_name);
             $student->dob = $request->date_of_birth;
             $student->gender = $request->gender;
-            $student->email = $request->email;
-            $student->registration_number =$registration_number;
-            $student->student_number = $student_number;
+            $student->personal_email = $request->personal_email;
+            $student->work_email = $request->work_email;
+            $student->registration_number =strtoupper($prefix.$request->student_id_number);
+            $student->student_number = strtoupper($request->student_id_number);
             $student->phone_number = $request->phone_number;
             $student->profile = $image_name;
-            $student->qr_code = $registration_number.'.png';
+            $student->qr_code = strtoupper($prefix.$request->student_id_number).'.png';
 
             if ($student->save()){
                 DB::commit();
@@ -152,7 +162,6 @@ class StudentController extends Controller
             }
         }catch (\Exception $exception){
             DB::rollBack();
-
             return back()->with('warning','Something went wrong, Try Again!');
         }
     }
@@ -179,11 +188,16 @@ class StudentController extends Controller
         $programs = Program::all();
         $locations = Location::all();
         $sessions = Session::all();
-        $trainee = Student::with('location','program','session')->find($id);
+        $trainee = Student::with('student_issue_item.item.item_type','location','program','session')->find($id);
 
+//        return $trainee;
         return view('pages.students.edit',compact('programs','locations','trainee','sessions'));
     }
 
+    public function uploadFormat(){
+        $pathToFile = public_path('Trainee_Upload_Format.xlsx');
+        return response()->download($pathToFile, 'Trainee_Upload_Format.xlsx');
+    }
     /**
      * Update the specified resource in storage.
      *
@@ -200,9 +214,9 @@ class StudentController extends Controller
             $path = public_path('assets/img/profile/trainees/' . $image_name);
             Image::make($image->getRealPath())->resize(413, 531)->save($path);
         }
-        QrCode::format('png')->size(100)
+        QrCode::format('png')->size(500)->errorCorrection('H')
             ->generate($request->first_name.' '.$request->other_name.' '.$request->last_name.' | '.$student->registration_number,
-                public_path('assets/qr_codes/trainees/'.$student->registration_number.'.png'));
+                public_path('assets/qr_codes/trainees/'.$student->student_number.'.png'));
 
         DB::beginTransaction();
         try{
@@ -212,7 +226,8 @@ class StudentController extends Controller
             $student->last_name = $request->last_name;
             $student->other_name = $request->other_name;
             $student->dob = $request->date_of_birth;
-            $student->email = $request->email;
+            $student->personal_email = $request->personal_email;
+            $student->work_email = $request->work_email;
             $student->phone_number = $request->phone_number;
             $student->session_id = $request->session_id;
             $student->gender = $request->gender;
@@ -233,6 +248,7 @@ class StudentController extends Controller
     {
         $student= Excel::toCollection(new StudentImport(), request()->file('file'));
 
+//        return $student;
         $students = $student[0];
         $countImages = count($request->file('pictures'));
         $countStudents = count($student[0]);
@@ -246,7 +262,6 @@ class StudentController extends Controller
         try{
             for ($i=0; $i<count($students); $i++) {
                 /** Generate Student Number*/
-
                 $findLocation = Location::find($request->location_id);
                 $findProgram = Program::find($request->program);
                 $findSession = Session::find($request->session_id);
@@ -258,16 +273,15 @@ class StudentController extends Controller
                 $student_number_prefix = $findProgram->prefix."-".substr($findSession->name,5);
 
                 //count the total number of students based on location,specialization and session they belong to
-                $countStudents = Student::where('location_id',$request->location_id)
+/*                $countStudents = Student::where('location_id',$request->location_id)
                     ->where('program_id',$request->program)
                     ->where('session_id',$request->session_id)
                     ->get()->count();
 
                 if ($countStudents == 0){
                     $registration_number =  $prefix.$student_number_prefix.'001';
-                    $student_number =$student_number_prefix. '001';
-                }
-                else{
+                    $student_number = $student_number_prefix. '001';
+                }else{
                     $lastStudentRecord = Student::where('location_id',$request->location_id)
                         ->where('program_id',$request->program)->latest('id')->first();
                     if (empty($lastStudentRecord)){
@@ -291,18 +305,25 @@ class StudentController extends Controller
                             $registration_number =   $prefix.$student_number;
                         }
                     }
-                }
-                $checkBeforeUpload = Student::where('email',$students[$i]['email'])->first();
+                }*/
+                $checkBeforeUpload = Student::where('personal_email',$students[$i]['personal_email'])
+                    ->orwhere('work_email',$students[$i]['work_email'])->first();
                 if ($checkBeforeUpload == ''){
-                    $image_name[$i] = $registration_number . '.' . $request->file('pictures')[$i]->getClientOriginalExtension();
+                    /*if (!is_dir('assets/img/id_card/'.$students[$i]['first_name'].' '.$students[$i]['other_name'].' '.$students[$i]['last_name'].'')){
+                      mkdir('assets/img/id_card/'.$students[$i]['first_name'].' '.$students[$i]['other_name'].' '.$students[$i]['last_name'].'',0777);
+                        $request->file('pictures')[$i]->move(public_path('assets/img/id_card/'.$students[$i]['first_name'].' '.$students[$i]['other_name'].' '.$students[$i]['last_name'].'/'), $students[$i]['first_name'].' '.$students[$i]['other_name'].' '.$students[$i]['last_name'].'.'.$request->file('pictures')[$i]->getClientOriginalExtension());
+                        QrCode::format('png')->size(500)->errorCorrection('H')
+                            ->generate($students[$i]['first_name'].' '.$students[$i]['other_name'].' '.$students[$i]['last_name'].' | '.$students[$i]['id_number'],public_path('assets/img/id_card/'.$students[$i]['first_name'].' '.$students[$i]['other_name'].' '.$students[$i]['last_name'].'/'.strtoupper($students[$i]['id_number']).'.png'));
+                    }*/
+                    $image_name[$i] = strtoupper($prefix.$students[$i]['id_number']) . '.' . $request->file('pictures')[$i]->getClientOriginalExtension();
                     $path = public_path('assets/img/profile/trainees/' . $image_name[$i]);
                     Image::make($request->file('pictures')[$i]->getRealPath())->resize(413, 531)->save($path);
 
                     /*
                     * Generate QR Code
                     */
-                    QrCode::format('png')
-                        ->generate($students[$i]['first_name'].' '.$students[$i]['other_name'].' '.$students[$i]['last_name'].' | '.$registration_number,public_path('assets/qr_codes/trainees/'.$registration_number.'.png'));
+                    QrCode::format('png')->size(500)->errorCorrection('H')
+                        ->generate($students[$i]['first_name'].' '.$students[$i]['other_name'].' '.$students[$i]['last_name'].' | '.$students[$i]['id_number'],public_path('assets/qr_codes/trainees/'.strtoupper($prefix.$students[$i]['id_number']).'.png'));
                     if (substr($students[$i]['phone_number'],'0','1') !=0)
                     {
                         $phone_number = "0".$students[$i]['phone_number'];
@@ -316,14 +337,15 @@ class StudentController extends Controller
                     $st->first_name = ucfirst($students[$i]['first_name']);
                     $st->last_name = ucfirst($students[$i]['last_name']);
                     $st->other_name = ucfirst($students[$i]['other_name']);
-                    $st->dob = $students[$i]['date_of_birth'];
+                    $st->dob = Date::excelToDateTimeObject($students[$i]['date_of_birth'])->format('Y-m-d');
                     $st->gender = $students[$i]['gender'];
-                    $st->email = $students[$i]['email'];
-                    $st->registration_number =$registration_number;
-                    $st->student_number = $student_number;
+                    $st->personal_email = $students[$i]['personal_email'];
+                    $st->work_email = $students[$i]['work_email'];
+                    $st->registration_number =strtoupper($prefix.$students[$i]['id_number']);
+                    $st->student_number = strtoupper($students[$i]['id_number']);
                     $st->phone_number =$phone_number;
                     $st->profile = $image_name[$i];
-                    $st->qr_code = $registration_number.'.png';
+                    $st->qr_code = strtoupper($prefix.$students[$i]['id_number']).'.png';
                     $st->save();
                 }
             }
@@ -331,6 +353,8 @@ class StudentController extends Controller
             return back()->with('success',count($student[0]).' Student(s) Uploaded Successfully');
         }catch (\Exception $exception){
             DB::rollBack();
+
+
             return back()->with('warning','Something went wrong, Try again.');
         }
     }
@@ -359,7 +383,7 @@ class StudentController extends Controller
             $studentQuery->where('session_id', $request->input('sessions_id'));
         }
 
-        $students = $studentQuery->simplePaginate(20);
+        $students = $studentQuery->simplePaginate(50);
         $programs = Program::all();
         $locations = Location::all();
         $sessions = Session::all();

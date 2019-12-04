@@ -7,6 +7,7 @@ use App\Brand;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 class BrandController extends Controller
 {
@@ -21,6 +22,9 @@ class BrandController extends Controller
      */
     public function index()
     {
+        if (!Gate::allows('canLogin')) {
+            abort(503,'Account Deactivated! Contact your Administrator');
+        }
         $brands = Brand::all();
         return view('pages.config.brands.index',compact('brands'));
     }
@@ -45,7 +49,7 @@ class BrandController extends Controller
     {
         $check = Brand::where('name',$request->brand_name)->first();
         if (!empty($check)){
-            return back()->with('error','Brand already exit');
+            return back()->with('error','Brand already exist');
         }
         DB::beginTransaction();
         try{

@@ -6,6 +6,7 @@ use App\Ownership;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 class OwnershipController extends Controller
 {
@@ -20,6 +21,12 @@ class OwnershipController extends Controller
      */
     public function index()
     {
+        if (!Gate::allows('canLogin')) {
+            abort(503,'Account Deactivated! Contact your Administrator');
+        }
+        if (!Gate::allows('isSuperAdmin')) {
+            abort(503,'You may not have access! Contact your Administrator');
+        }
         $ownerships = Ownership::all();
         return view('pages.config.ownership.index',compact('ownerships'));
     }
@@ -44,7 +51,7 @@ class OwnershipController extends Controller
     {
         $check = Ownership::where('description',$request->description)->first();
         if (!empty($check)){
-            return back()->with('error','Ownership already exit');
+            return back()->with('error','Ownership already exist');
         }
         DB::beginTransaction();
         try{

@@ -16,6 +16,7 @@ class CreateUsersTable extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->integer('location_id');
+            $table->integer('staff_id')->nullable();
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
@@ -25,6 +26,7 @@ class CreateUsersTable extends Migration
             $table->string('phone_number',25)->nullable();
             $table->boolean('updated')->default(0);
             $table->string('picture')->default('avata.png');
+            $table->boolean('status')->default(0);
             $table->rememberToken();
             $table->timestamps();
         });

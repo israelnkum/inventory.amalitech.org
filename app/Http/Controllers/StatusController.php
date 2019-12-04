@@ -6,6 +6,7 @@ use App\Status;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 class StatusController extends Controller
 {
@@ -20,6 +21,12 @@ class StatusController extends Controller
      */
     public function index()
     {
+        if (!Gate::allows('canLogin')) {
+            abort(503,'Account Deactivated! Contact your Administrator');
+        }
+        if (!Gate::allows('isSuperAdmin')) {
+            abort(503,'You may not have access! Contact your Administrator');
+        }
         $statuses = Status::all();
         return view('pages.config.status.index',compact('statuses'));
     }
@@ -44,7 +51,7 @@ class StatusController extends Controller
     {
         $check = Status::where('name',$request->status_name)->first();
         if (!empty($check)){
-            return back()->with('error','Status already exit');
+            return back()->with('error','Status already exist');
         }
         DB::beginTransaction();
         try{

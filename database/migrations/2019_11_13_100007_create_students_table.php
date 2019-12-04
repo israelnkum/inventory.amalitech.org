@@ -23,11 +23,12 @@ class CreateStudentsTable extends Migration
             $table->string('other_name')->nullable();
             $table->string('dob');
             $table->string('gender',15);
-            $table->string('email');
+            $table->string('personal_email');
+            $table->string('work_email');
             $table->string('registration_number');
             $table->string('student_number');
             $table->string('phone_number',25);
-            $table->string('staff')->default('avata.png');
+            $table->string('profile')->default('avata.png');
             $table->string('qr_code');
             $table->timestamps();
         });

@@ -41,7 +41,7 @@
                             <tbody>
                             @php($i=1)
                             @foreach($statuses as $status)
-                                @if($status->name == "In-Service" || $status->name == "In-Store")
+                                @if($status->name == "In-Use")
                                     <tr>
                                         <td>{{$i}}</td>
                                         <td>{{$status->name}}</td>
@@ -84,9 +84,9 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                @php($i= -1)
+                                @php($i=0)
                                 @foreach($statuses as $status)
-                                    @if($status->name != "In-Service" && $status->name != "In-Store")
+                                    @if($status->name != "In-Use")
                                         <tr>
                                             <td></td>
                                             <td>{{$i}}</td>

@@ -10,11 +10,13 @@
                     <a href="{{route('staff.edit',$trainer->id)."?".Hash::make(time())}}">{{$trainer->first_name." ".$trainer->other_name." ".$trainer->last_name}}</a>
                 </li>
             @endcomponent
-            <div class="col-md-9">
+            <div class="col-md-8">
                 <div class="card bg-transparent border-0 shadow-sm">
                     <div class="card-header p-2">
                         Staff Info
-                        <a href="javascript:void(0)" data-toggle="modal" data-target="#addStudent" class="btn btn-link p-0 float-right">Edit info</a>
+                        @can('isSuperAdmin')
+                            <a href="javascript:void(0)" data-toggle="modal" data-target="#addStudent" class="btn btn-link p-0 float-right">Edit info</a>
+                        @endcan
                     </div>
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-end">
@@ -23,84 +25,197 @@
                                     <div class="col-md-3">
                                         <img src="{{asset('assets/img/profile/staff/'.$trainer->profile)}}" alt="" class="img-fluid">
                                     </div>
-                                    <div class="col-md-9">
-                                        <p class="font-weight-bold">
-                                            <i class="fa fa-user-alt"></i> {{$trainer->first_name." ".$trainer->other_name." ".$trainer->last_name}}<br>
-                                            {{--                                            {{$trainer->registration_number}}<br>--}}
-                                        </p>
-                                        <p><i class="fa fa-map-marker-alt"></i> {{$trainer->location->city_town.", ".$trainer->location->country}}<br></p>
-                                        <p><i class="fa fa-phone-alt"></i> {{$trainer->phone_number}}</p>
-                                        <p><i class="fa fa-envelope"></i> {{$trainer->email}}</p>
+                                    <div class="col-md-9 d-flex justify-content-between">
+                                        <div>
+                                            <h3><i class="fa fa-user-alt" style="font-size: 12px"></i> {{$trainer->first_name." ".$trainer->other_name." ".$trainer->last_name}}<br></h3>
+                                            <h5><i class="fa fa-map-marker-alt" style="font-size: 12px"></i> {{$trainer->location->city_town.", ".$trainer->location->country}}<br></h5>
+                                            <h5><i class="fa fa-phone-alt" style="font-size: 12px"></i> {{$trainer->phone_number}}</h5>
+                                            <h5><i class="fa fa-envelope" style="font-size: 12px"></i> {{$trainer->personal_email}}</h5>
+                                            <h5><i class="fa fa-envelope" style="font-size: 12px"></i> {{$trainer->work_email}}</h5>
+                                        </div>
+
+                                        <div class="text-center">
+                                            <p class="font-weight-bold text-danger">{{$trainer->registration_number}}</p>
+                                            <img height="auto" width="150" src="{{asset('assets/qr_codes/staff/'.$trainer->qr_code)}}" alt="" class="img-fluid">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="">
-                                <form onsubmit="return confirm('Do you really want to delete?')" action="{{route('staff.destroy',$trainer->id)}}" method="post">
-                                    @csrf
-                                    {!! @method_field('delete') !!}
-                                    <button class="btn btn-link text-danger text-decoration-none" type="submit">Delete</button>
-                                </form>
-                            </div>
                         </div>
+                        <hr>
                         <div class="row">
-                            <div class="col-md-12">
-                                <hr>
-                                <table class="table p-0  table-borderless table-striped">
+                            <div class="col-md-6">
+                                <table class="table p-0  table-borderless ">
                                     <tbody class="text-left">
                                     <tr>
                                         <td class="p-2 font-weight-bold">Date of Birth:</td>
                                         <td class="p-2">{{$trainer->dob}}</td>
+                                    </tr>
+                                    <tr>
                                         <td class="p-2 font-weight-bold">Joining Date: </td>
                                         <td class="p-2">{{$trainer->joining_date}}</td>
                                     </tr>
                                     <tr>
-                                        <td class="p-2 n-weight-bold">Designation: </td>
-                                        <td class="p-2">{{$trainer->designation->designation}}</td>
-                                        <td class="p-2 font-weight-bold">Designation: </td>
+                                        <td class="p-2 font-weight-bold">Contract Valid Till: </td>
                                         <td class="p-2">{{$trainer->contract_valid_till}}</td>
                                     </tr>
                                     </tbody>
                                 </table>
                             </div>
+                            <div class="col-md-6">
+                                <div class="card bg-transparent border-0 ">
+                                    <div class="card-header bg-transparent font-weight-bold p-1 m-0">
+                                        Designation(s)
+                                        @can('isSuperAdmin')
+                                            <button type="submit" data-toggle="modal" data-target="#addDesignation" class="btn btn-primary btn-sm float-right">Add Designation</button>
+                                        @endcan
+                                    </div>
+                                    <div class="card-body">
+                                        <ul class="list-group list-group-flush ">
+                                            @foreach($trainer->staff_designation as $designation)
+                                                <li class="list-group-item bg-transparent p-0 d-flex justify-content-between align-items-center">
+                                                    {{$designation->designation->designation}}
+                                                    @can('isSuperAdmin')
+                                                        <form class="p-0" action="{{route('delete-staff-designation')}}" onsubmit="return confirm('Please confirm Delete!')" method="post">
+                                                            @csrf
+                                                            <input type="hidden" value="{{$designation->id}}" name="designation_id">
+                                                            <input type="hidden" value="{{$trainer->id}}" name="staff_id">
+                                                            <button class="p-0 btn-sm btn text-danger text-decoration-none" title="Delete" type="submit">Delete</button>
+                                                        </form>
+                                                    @endcan
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="col-md-12">
-                                <p class="font-weight-bold"><span class="text-danger">Remarks</span> <br>{{$trainer->remarks}}</p>
+                                <hr>
+                                <p ><span class="font-weight-bold">Remarks</span> <br>{{$trainer->remarks}}</p>
+                                <hr>
+                            </div>
+                            <div class="col-md-12">
+                                @can('isSuperAdmin')
+                                    <div class="">
+                                        <form onsubmit="return confirm('Do you really want to delete?')" action="{{route('staff.destroy',$trainer->id)}}" method="post">
+                                            @csrf
+                                            {!! @method_field('delete') !!}
+                                            <button class="btn btn-link text-danger text-decoration-none" type="submit">Delete Staff</button>
+                                        </form>
+                                    </div>
+                                @endcan
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <div class="card bg-transparent border-0 shadow-sm">
-                    <div class="card-header p-2">
-                        Qr-Code
-                    </div>
-                    <div class="card-body text-center">
-                        <p class="font-weight-bold text-danger">{{$trainer->registration_number}}</p>
-                        <img src="{{asset('assets/qr_codes/staff/'.$trainer->qr_code)}}" alt="" class="img-fluid">
-                    </div>
-                </div>
-            </div>
-                <hr>
-            <div class="col-md-6 mt-2">
-                <div class="card bg-transparent border-0 shadow-sm">
-                    <div class="card-header p-2 text-danger">
+                    <div class="card-header p-2 font-weight-bold">
                         Subject(s) Teaching
-                        <button type="submit" data-toggle="modal" data-target="#addProgram" class="btn btn-primary btn-sm float-right">Add a Program</button>
+                        @can('isSuperAdmin')
+                            <button type="submit" data-toggle="modal" data-target="#addProgram" class="btn btn-primary btn-sm float-right">Add Program</button>
+                        @endcan
                     </div>
                     <div class="card-body">
                         <ul class="list-group list-group-flush ">
                             @foreach($trainer->program_teaching as $subject)
                                 <li class="list-group-item bg-transparent p-0 d-flex justify-content-between align-items-center">
                                     {{$subject->program->name}}
-                                    <form class="p-0" action="{{route('delete-staff-subject')}}" onsubmit="return confirm('Please confirm Delete!')" method="post">
-                                        @csrf
-                                        <input type="hidden" value="{{$subject->id}}" name="subject_id">
-                                        <input type="hidden" value="{{$trainer->id}}" name="staff_id">
-                                        <button class="p-0 btn btn-link text-decoration-none text-danger" type="submit">Delete</button>
-                                    </form>
+                                    @can('isSuperAdmin')
+                                        <form class="p-0" action="{{route('delete-staff-subject')}}" onsubmit="return confirm('Please confirm Delete!')" method="post">
+                                            @csrf
+                                            <input type="hidden" value="{{$subject->id}}" name="subject_id">
+                                            <input type="hidden" value="{{$trainer->id}}" name="staff_id">
+                                            <button class="p-0 btn-sm btn btn-link text-decoration-none text-danger" type="submit">Delete</button>
+                                        </form>
+                                    @endcan
                                 </li>
                             @endforeach
                         </ul>
+                    </div>
+                </div>
+                <hr>
+                <div class="card bg-transparent border-0 shadow-sm">
+                    <div class="card-header p-2 font-weight-bold">
+                        Issued Items
+                    </div>
+                    <div class="card-body ">
+                        @if(count($trainer->staff_issue_item) == 0)
+                            <div class="text-center">
+                                <span class="text-dark">No Item Issued</span>
+                            </div>
+                        @else
+                            <div class="accordion" id="accordionExample">
+                                @foreach($trainer->staff_issue_item as $staff_issue)
+                                    <a href="javascript:void(0)" class="font-weight-bold text-dark text-decoration-none" data-toggle="collapse" data-target="#std{{$staff_issue->id}}" aria-expanded="true" aria-controls="collapseOne">
+                                        {{$staff_issue->item->asset_tag_number}}
+                                        <small class="text-right bg-dark text-white p-1"> {{$staff_issue->item->item_type->name}}</small>
+                                    </a>
+                                    <div id="std{{$staff_issue->id}}" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
+                                        <hr>
+                                        <div class="d-flex justify-content-between">
+                                            <span class="font-weight-bold">Issued By:</span>
+                                            {{$trainer->issued_by}}
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <span class="font-weight-bold">Date Issued:</span>
+                                            {{$staff_issue->date_collected}}
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <span class="font-weight-bold">Remarks:</span>
+                                            {{$staff_issue->issue_remarks}}
+                                        </div>
+                                        <hr>
+                                        @if($staff_issue->date_returned =="")
+                                            <span class="text-danger">Not Yet Returned</span>
+                                        @else
+                                            <div class="d-flex justify-content-between">
+                                                <span class="font-weight-bold">Date returned:</span>
+                                                {{$staff_issue->date_returned}}
+                                            </div>
+                                            <div class="d-flex justify-content-between">
+                                                <span class="font-weight-bold">Received By:</span>
+                                                {{$staff_issue->received_by}}
+                                            </div>
+                                        @endif
+                                        <div class="text-right">
+                                            <a href="{{route('items.edit',$staff_issue->item->id)}}" class="btn btn-sm btn-primary">View Item</a>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+                </div>
+                <hr>
+                <div class="card bg-transparent border-0 shadow-sm">
+                    <div class="card-header p-2 font-weight-bold">
+                        In-Charge
+                    </div>
+                    <div class="card-body ">
+                        @if(count($trainer->items) == 0)
+                            <div class="text-center">
+                                <span class="text-dark">No Item</span>
+                            </div>
+                        @else
+                            <div class="accordion" id="accordionExample">
+                                @foreach($trainer->items as $item)
+                                    <a href="javascript:void(0)" class="font-weight-bold text-dark text-decoration-none" data-toggle="collapse" data-target="#std{{$item->id}}" aria-expanded="true" aria-controls="collapseOne">
+                                        {{$item->asset_tag_number}}
+                                        <small class="text-right bg-dark text-white p-1"> {{$item->item_type->name}}</small>
+                                    </a>
+                                    <div id="std{{$item->id}}" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
+                                        <hr>
+                                        {{--<div class="text-right">
+                                            <a href="{{route('items.edit',$staff_issue->item->id)}}" class="btn btn-sm btn-primary">View Item</a>
+                                        </div>--}}
+                                    </div>
+                                    <hr>
+                                @endforeach
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -130,14 +245,54 @@
                                     @endforeach
                                 </select>
                                 <div class="invalid-feedback">
-                                    Required
+                                    Program Required
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Update Info</button>
+                        <button type="submit" class="btn btn-primary">Add Program</button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- Add Designations Modal -->
+    <div class="modal fade" id="addDesignation" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <form action="{{route('add-designation',$trainer->id)}}" method="post" class="needs-validation" novalidate>
+                    @csrf
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Add Designation</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-row">
+                            <div class="col-md-12 mb-2">
+                                <label for="designations" class="mb-0">Designations</label>
+                                <select required id="designations" multiple style="width: 100%" name="designations[]" class="form-control form-control-lg select2">
+                                    @foreach($designations as $designation)
+                                        @if(!in_array($designation->id,$st_designations))
+                                            <option value="{{$designation->id}}">{{$designation->designation}}</option>
+                                        @endif
+                                    @endforeach
+                                </select>
+                                <div class="invalid-feedback">
+                                    Designation Required
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Add Designation</button>
                     </div>
                 </form>
             </div>
@@ -206,13 +361,20 @@
                                         </div>
                                     </div>
                                     <div class="col-md-4 ">
-                                        <label for="email" class="mb-0">Email</label>
-                                        <input type="email" value="{{$trainer->email}}" required class="form-control form-control-sm" name="email" id="email" placeholder="Email">
+                                        <label for="personal_email" class="mb-0">Personal Email</label>
+                                        <input type="email" value="{{$trainer->personal_email}}" required class="form-control form-control-sm" name="personal_email" id="personal_email" placeholder="Personal Email">
+                                        <div class="invalid-feedback">
+                                           Personal Email required
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 ">
+                                        <label for="work_email" class="mb-0">Work Email</label>
+                                        <input type="email" value="{{$trainer->work_email}}"  class="form-control form-control-sm" name="work_email" id="work_email" placeholder="Work Email">
                                         <div class="invalid-feedback">
                                             Email required
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
+                                    {{--<div class="col-md-4">
                                         <label for="designation" class="mb-0">Designation</label>
                                         <select required id="designation" style="width: 100%" name="designation" class="form-control form-control-lg select2">
                                             <option value=""></option>
@@ -223,7 +385,7 @@
                                         <div class="invalid-feedback">
                                             Designation required
                                         </div>
-                                    </div>
+                                    </div>--}}
                                     {{--<div class="col-md-12 mb-2">
                                         <label for="program" class="mb-0">Specialization</label>
                                         <select id="program" multiple style="width: 100%" name="program[]" class="form-control form-control-lg select2">

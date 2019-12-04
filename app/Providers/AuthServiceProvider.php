@@ -12,7 +12,7 @@ class AuthServiceProvider extends ServiceProvider
      * @var array
      */
     protected $policies = [
-         'App\Model' => 'App\Policies\ModelPolicy',
+        'App\Model' => 'App\Policies\ModelPolicy',
     ];
 
     /**
@@ -26,11 +26,22 @@ class AuthServiceProvider extends ServiceProvider
         $this->registerPolicies($gate);
 
         $gate->define('isSuperAdmin',function ($user){
-           return $user->user_type == 'Super Admin';
+            return $user->user_type == 'Super Admin';
         });
 
         $gate->define('isAdmin',function ($user){
             return $user->user_type == 'Admin';
+        });
+        $gate->define('isInCharge',function ($user){
+            return $user->user_type == 'In-Charge';
+        });
+
+        $gate->define('hasUpdated',function ($user){
+            return $user->updated == 1;
+        });
+
+        $gate->define('canLogin',function ($user){
+            return $user->status == 0;
         });
     }
 }

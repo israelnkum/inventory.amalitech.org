@@ -6,6 +6,7 @@ use App\Session;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 class SectionController extends Controller
 {
@@ -20,6 +21,12 @@ class SectionController extends Controller
      */
     public function index()
     {
+        if (!Gate::allows('canLogin')) {
+            abort(503,'Account Deactivated! Contact your Administrator');
+        }
+        if (!Gate::allows('isSuperAdmin')) {
+            abort(503,'You may not have access! Contact your Administrator');
+        }
         $sessions = Session::all();
         return view('pages.config.session.index',compact('sessions'));
     }
@@ -44,7 +51,7 @@ class SectionController extends Controller
     {
         $check = Session::where('name',$request->session_name)->first();
         if (!empty($check)){
-            return back()->with('error','Session already exit');
+            return back()->with('error','Session already exist');
         }
         DB::beginTransaction();
         try{
@@ -106,7 +113,6 @@ class SectionController extends Controller
         }catch (\Exception $exception)
         {
             DB::rollBack();
-            return $exception;
             return back()->with('warning','Something went wrong, Try Again!');
         }
     }
